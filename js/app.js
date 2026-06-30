@@ -256,7 +256,7 @@ function openBlogPost(slug) {
     grid.id = 'blogMultiImages';
     grid.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; margin-bottom:1.5rem;';
     grid.innerHTML = p.images.map(src =>
-      `<img src="${src}" alt="${p.title}" style="width:100%; border-radius:var(--radius,12px); border:1px solid var(--border-lit,#3d2f20); display:block;" loading="lazy">`
+      `<img src="${src}" alt="${p.title}" style="width:100%; border-radius:var(--radius,12px); border:1px solid var(--border-lit,#3d2f20); display:block; cursor:zoom-in;" loading="lazy" onclick="openLightbox(this.src)" title="Click to enlarge">`
     ).join('');
     document.getElementById('blogPostBody').before(grid);
   } else if (p.image) {
@@ -329,8 +329,9 @@ function showToast(msg) {
 // ══════════════════════════════════════════
 //  LIGHTBOX
 // ══════════════════════════════════════════
-function openLightbox() {
-  const src = document.getElementById('singleImg').src;
+function openLightbox(src) {
+  // Default to the comic single-view image if no src passed (backward compatible)
+  if (!src) src = document.getElementById('singleImg').src;
   if (!src) return;
   const lb = document.getElementById('lightbox');
   document.getElementById('lightboxImg').src = src;
@@ -344,6 +345,11 @@ function closeLightbox() {
 }
 
 document.addEventListener('keydown', e => {
+  // Lightbox takes priority — block all underlying page navigation while open
+  if (document.getElementById('lightbox').style.display === 'flex') {
+    if (e.key === 'Escape') closeLightbox();
+    return;
+  }
   if (document.getElementById('view-single').style.display === 'block') {
     if (e.key === 'ArrowLeft')  navigateComic(-1);
     if (e.key === 'ArrowRight') navigateComic(1);
@@ -354,7 +360,6 @@ document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight') navigateChar(1);
     if (e.key === 'Escape')     backToCharacters();
   }
-  if (document.getElementById('lightbox').style.display === 'flex') { if (e.key === 'Escape') closeLightbox(); return; }
   if (document.getElementById('view-blog-post').style.display === 'block') {
     if (e.key === 'ArrowLeft')  navigateBlog(-1);
     if (e.key === 'ArrowRight') navigateBlog(1);
