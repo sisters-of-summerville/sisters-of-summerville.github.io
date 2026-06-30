@@ -227,7 +227,8 @@
         <div class="char-info-tags" id="charViewTags"></div>
       </div>
       <div class="char-full-img-wrap">
-        <img id="charViewImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">
+        <img id="charViewImg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt=""
+             onclick="openLightbox(this.src)" title="Click to enlarge" style="cursor:zoom-in;">
       </div>
       <button class="nav-arrow char-nav-right" id="charArrowNext" onclick="navigateChar(1)" title="Next character">&#9654;</button>
     </div>
@@ -267,7 +268,7 @@
     <div class="blog-youtube-wrap" id="blogYoutubeWrap" style="display:none;">
       <iframe id="blogYoutubeFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
-    <img class="blog-post-image" id="blogPostImage" src="" alt="" style="display:none;">
+    <img class="blog-post-image" id="blogPostImage" src="" alt="" style="display:none; cursor:zoom-in;" onclick="openLightbox(this.src)" title="Click to enlarge">
     <div class="blog-post-body" id="blogPostBody"></div>
   </div>
   <footer class="site-footer">
