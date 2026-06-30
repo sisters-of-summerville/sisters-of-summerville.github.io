@@ -2,14 +2,14 @@
 
 A dark-mode, searchable daily comic strip website featuring Honey Bear the Yorkie and Bootsie Belle the tuxedo cat. Built for GitHub Pages — free to host, easy to update daily.
 
-🌐 **Live site:** [sisters-of-summerville.github.io/Sisters-of-Summerville](https://sisters-of-summerville.github.io/Sisters-of-Summerville/)
+🌐 **Live site:** [sisters-of-summerville.github.io](https://sisters-of-summerville.github.io/)
 
------
+---
 
 ## 📁 Repository Structure
 
 ```
-Sisters-of-Summerville/
+sisters-of-summerville.github.io/
 ├── index.html                          ← Website HTML structure
 ├── captions.json                       ← All comic episode data (newest first)
 ├── characters.json                     ← All character profile data
@@ -37,7 +37,7 @@ Sisters-of-Summerville/
 └── README.md
 ```
 
------
+---
 
 ## 🚀 Site Features
 
@@ -51,28 +51,25 @@ Sisters-of-Summerville/
 - **Lightbox** — Click any comic image to view it full screen
 - **Responsive** — Works on desktop, tablet, and mobile
 
------
+---
 
 ## 📅 Daily Workflow — Adding Content
 
 ### Option A — Admin Tool (Recommended)
-
 Use the private admin tool to publish Comics, Blog posts, and Characters directly from your browser.
 
 1. Navigate to the private admin URL
-1. Enter your password
-1. Select **Comic**, **Blog**, or **Character**
-1. Fill in the form and upload your image
-1. Click **🚀 PUBLISH**
-1. The tool automatically updates the correct JSON file and `rss.xml`
-1. Site goes live within ~2 minutes
+2. Enter your password
+3. Select **Comic**, **Blog**, or **Character**
+4. Fill in the form and upload your image
+5. Click **🚀 PUBLISH**
+6. The tool automatically updates the correct JSON file and `rss.xml`
+7. Site goes live within ~2 minutes
 
 ### Option B — Manual Update
-
 Update the relevant files directly in GitHub:
 
 **For a new Comic** — update `captions.json` (newest first) and `rss.xml`:
-
 ```json
 {
   "date": "2026-05-01",
@@ -84,7 +81,6 @@ Update the relevant files directly in GitHub:
 ```
 
 **For a new Blog Post** — update `blog.json` (newest first):
-
 ```json
 {
   "slug": "your-post-slug",
@@ -97,7 +93,6 @@ Update the relevant files directly in GitHub:
 ```
 
 **For a new Character** — update `characters.json`:
-
 ```json
 {
   "name": "Character Name",
@@ -107,24 +102,24 @@ Update the relevant files directly in GitHub:
 }
 ```
 
------
+---
 
 ## 🔗 Shareable URLs
 
-|Page                |URL                        |
-|--------------------|---------------------------|
-|Homepage            |`.../#`                    |
-|Subscribe           |`.../#subscribe`           |
-|About               |`.../#about`               |
-|Blog grid           |`.../#blog`                |
-|Individual blog post|`.../#blog/post-slug`      |
-|Characters grid     |`.../#characters`          |
-|Individual character|`.../#character/honey-bear`|
-|Individual comic    |`.../#2026-05-01`          |
+| Page | URL |
+|------|-----|
+| Homepage | `.../#` |
+| Subscribe | `.../#subscribe` |
+| About | `.../#about` |
+| Blog grid | `.../#blog` |
+| Individual blog post | `.../#blog/post-slug` |
+| Characters grid | `.../#characters` |
+| Individual character | `.../#character/honey-bear` |
+| Individual comic | `.../#2026-05-01` |
 
-Direct subscribe link: **[sisters-of-summerville.github.io/Sisters-of-Summerville/#subscribe](https://sisters-of-summerville.github.io/Sisters-of-Summerville/#subscribe)**
+Direct subscribe link: **[sisters-of-summerville.github.io/#subscribe](https://sisters-of-summerville.github.io/#subscribe)**
 
------
+---
 
 ## 🖼️ Image Guidelines
 
@@ -135,32 +130,32 @@ Direct subscribe link: **[sisters-of-summerville.github.io/Sisters-of-Summervill
 - **File names are case-sensitive** — `2026-05-01.JPEG` and `2026-05-01.jpeg` are different files
 - **Compress before uploading** using [squoosh.app](https://squoosh.app) — free and fast
 
------
+---
 
 ## 📡 RSS & Email Subscriptions
 
 The site uses **follow.it** to deliver new content to email subscribers.
 
-- RSS feed URL: `https://sisters-of-summerville.github.io/Sisters-of-Summerville/rss.xml`
+- RSS feed URL: `https://sisters-of-summerville.github.io/rss.xml`
 - The admin tool automatically adds RSS entries for Comics, Blog posts, and new Characters
 - RSS emails include the image embedded directly so subscribers see the comic without clicking
 - Keep the newest ~30 items in `rss.xml` — older entries can be trimmed
 
------
+---
 
 ## 🔍 Search
 
 Search works automatically across episode titles, descriptions, dates, and tags. Searching always shows all matching results regardless of pagination state.
 
------
+---
 
 ## ⚠️ Important Notes
 
-- **Never edit `index.html` by downloading from the live site URL** — Cloudflare can inject scripts. Always use GitHub’s built-in web editor (pencil ✏️ icon) or upload a fresh file.
+- **Never edit `index.html` by downloading from the live site URL** — Cloudflare can inject scripts. Always use GitHub's built-in web editor (pencil ✏️ icon) or upload a fresh file.
 - **Admin tool is password protected** — the URL is not linked anywhere on the public site and should be kept private.
 - **CSS lives in `css/styles.css`** and **JavaScript in `js/app.js`** — edit these separately from `index.html`.
 
------
+---
 
 ## 🎨 Site Colors
 
@@ -173,6 +168,6 @@ All colors are CSS variables at the top of `css/styles.css`:
 --bg-card:  #1c1818;   /* Card background */
 ```
 
------
+---
 
 *Creative partnership between Artist + AI · Made with ❤️ for Honey Bear & Bootsie Belle · Summerville, SC*

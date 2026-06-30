@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoS Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0b0b13;
+    --bg-mid:   #131010;
+    --bg-card:  #1c1818;
+    --amber:    #f5a623;
+    --amber2:   #ff9900;
+    --blue:     #3ab5ff;
+    --green:    #4caf81;
+    --red:      #e05252;
+    --purple:   #9b59b6;
+    --text:     #f0eaf8;
+    --muted:    #8a7f7f;
+    --border:   #2a2020;
+    --border-l: #3d2f20;
+    --radius:   12px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+
+  .app-header { width: 100%; background: var(--bg-mid); border-bottom: 1px solid var(--border-l); padding: 0.8rem 2rem; display: flex; align-items: center; gap: 1rem; }
+  .app-title { font-family: 'Bangers', cursive; font-size: 1.6rem; letter-spacing: 0.06em; background: linear-gradient(135deg, #ffe0a0, var(--amber)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .app-subtitle { font-family: 'Caveat', cursive; font-size: 0.9rem; color: var(--blue); }
+
+  .screen { display: none; width: 100%; max-width: 640px; padding: 2rem 1.5rem; }
+  .screen.active { display: block; }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border-l); border-radius: var(--radius); padding: 2rem; box-shadow: 0 8px 40px rgba(0,0,0,0.5); margin-bottom: 1rem; }
+  .card-title { font-family: 'Bangers', cursive; font-size: 1.8rem; letter-spacing: 0.06em; margin-bottom: 0.3rem; }
+  .card-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.6rem; line-height: 1.5; }
+
+  /* Mode selector */
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 0; }
+  .mode-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 0.5rem; padding: 1.5rem 1rem;
+    background: var(--bg-mid); border: 2px solid var(--border-l);
+    border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
+    font-family: 'Bangers', cursive; font-size: 1.1rem; letter-spacing: 0.06em;
+    color: var(--muted); text-align: center;
+  }
+  .mode-btn:hover { border-color: var(--amber); color: var(--amber); background: rgba(245,166,35,0.06); transform: translateY(-2px); }
+  .mode-btn.active { border-color: var(--amber); color: var(--amber); background: rgba(245,166,35,0.1); }
+  .mode-btn .mode-icon { font-size: 2rem; }
+  .mode-btn.blog-btn:hover, .mode-btn.blog-btn.active { border-color: var(--blue); color: var(--blue); background: rgba(58,181,255,0.08); }
+  .mode-btn.char-btn:hover, .mode-btn.char-btn.active { border-color: var(--purple); color: var(--purple); background: rgba(155,89,182,0.08); }
+
+  /* Form fields */
+  .field { margin-bottom: 1.2rem; }
+  label { display: block; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 0.4rem; }
+  label .req { color: var(--amber); }
+  label .opt { color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+  input[type="text"], input[type="date"], input[type="password"], input[type="url"], textarea, select {
+    width: 100%; background: var(--bg-mid); border: 1px solid var(--border-l);
+    border-radius: 9px; padding: 0.65rem 1rem; color: var(--text);
+    font-family: 'Nunito', sans-serif; font-size: 0.95rem; outline: none;
+    transition: border-color 0.2s; resize: vertical;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(245,166,35,0.1); }
+  textarea { min-height: 140px; line-height: 1.6; }
+
+  .drop-zone { border: 2px dashed var(--border-l); border-radius: var(--radius); padding: 1.5rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; position: relative; overflow: hidden; }
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--amber); background: rgba(245,166,35,0.04); }
+  .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .drop-icon { font-size: 2rem; margin-bottom: 0.4rem; display: block; }
+  .drop-text { font-size: 0.85rem; color: var(--muted); }
+  .drop-text strong { color: var(--amber); }
+  .preview-wrap { margin-top: 0.8rem; display: none; }
+  .preview-wrap img { width: 100%; border-radius: 8px; border: 1px solid var(--border-l); display: block; }
+  .preview-filename { font-size: 0.75rem; color: var(--blue); margin-top: 0.3rem; font-family: 'Caveat', cursive; }
+
+  .btn { width: 100%; padding: 0.75rem; border: none; border-radius: 10px; font-family: 'Bangers', cursive; font-size: 1.2rem; letter-spacing: 0.08em; cursor: pointer; transition: filter 0.2s, transform 0.2s; }
+  .btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-comic  { background: linear-gradient(135deg, var(--amber2), var(--amber)); color: #0b0b13; }
+  .btn-blog   { background: linear-gradient(135deg, #2980b9, var(--blue)); color: #0b0b13; }
+  .btn-char   { background: linear-gradient(135deg, #8e44ad, var(--purple)); color: #fff; }
+  .btn-secondary { background: var(--bg-mid); border: 1px solid var(--border-l); color: var(--text); font-size: 1rem; }
+
+  .progress-wrap { display: none; flex-direction: column; gap: 0.75rem; margin: 1.2rem 0; }
+  .progress-step { display: flex; align-items: center; gap: 0.75rem; font-size: 0.88rem; color: var(--muted); padding: 0.65rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-mid); transition: all 0.3s; }
+  .progress-step.active { color: var(--amber); border-color: rgba(245,166,35,0.3); }
+  .progress-step.done   { color: var(--green); border-color: rgba(76,175,129,0.3); }
+  .progress-step.error  { color: var(--red);   border-color: rgba(224,82,82,0.3); }
+  .step-icon { font-size: 1.1rem; flex-shrink: 0; width: 22px; text-align: center; }
+  .step-spin { animation: spin 0.8s linear infinite; display: inline-block; }
+  @keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+
+  .success-box { display: none; text-align: center; padding: 1.5rem; border: 1px solid rgba(76,175,129,0.35); border-radius: var(--radius); background: rgba(76,175,129,0.06); margin-top: 1rem; }
+  .success-box .big-check { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
+  .success-box h3 { font-family: 'Bangers', cursive; font-size: 1.6rem; letter-spacing: 0.06em; color: var(--green); margin-bottom: 0.4rem; }
+  .success-box p  { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
+  .view-link { display: inline-block; padding: 0.5rem 1.2rem; border-radius: 8px; background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.35); color: var(--amber); text-decoration: none; font-weight: 700; font-size: 0.85rem; }
+
+  .pat-hint { font-size: 0.78rem; color: var(--muted); line-height: 1.6; margin-top: 0.4rem; }
+  .pat-hint a { color: var(--blue); }
+  .pat-status { font-size: 0.78rem; font-weight: 700; margin-top: 0.5rem; padding: 0.4rem 0.8rem; border-radius: 6px; display: none; }
+  .pat-status.ok  { background: rgba(76,175,129,0.12); color: var(--green); border: 1px solid rgba(76,175,129,0.3); }
+  .pat-status.err { background: rgba(224,82,82,0.12); color: var(--red); border: 1px solid rgba(224,82,82,0.3); }
+
+  .alert { padding: 0.65rem 1rem; border-radius: 8px; font-size: 0.83rem; margin-bottom: 1rem; display: none; }
+  .alert.err { background: rgba(224,82,82,0.12); border: 1px solid rgba(224,82,82,0.3); color: var(--red); }
+  .divider { height: 1px; background: var(--border-l); margin: 1.2rem 0; }
+
+  .settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .settings-btn { background: none; border: 1px solid var(--border-l); border-radius: 7px; padding: 0.3rem 0.8rem; color: var(--muted); font-size: 0.75rem; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .settings-btn:hover { color: var(--amber); border-color: var(--amber); }
+
+  .youtube-preview { margin-top: 0.75rem; display: none; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-l); }
+  .youtube-preview iframe { width: 100%; height: 100%; border: none; }
+
+  .tag-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
+  .app-footer { margin-top: auto; padding: 1.5rem; font-size: 0.72rem; color: var(--muted); text-align: center; opacity: 0.5; }
+
+  /* Form panels */
+  .form-panel { display: none; }
+  .form-panel.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div>
+    <div class="app-title">🐾 SoS Admin</div>
+    <div class="app-subtitle">Sisters of Summerville · Content Manager</div>
+  </div>
+</div>
+
+<!-- PASSWORD SCREEN -->
+<div class="screen active" id="screen-password">
+  <div style="text-align:center; padding:2rem 0 1.5rem;">
+    <div style="font-size:3rem; margin-bottom:0.5rem;">🐾</div>
+    <div style="font-family:'Bangers',cursive; font-size:2.4rem; letter-spacing:0.05em; background:linear-gradient(135deg,#ffe0a0,#f5a623); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">Sisters of Summerville</div>
+    <div style="font-family:'Caveat',cursive; color:#3ab5ff; margin-top:0.2rem;">Admin · Content Manager</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔒 Enter Password</div>
+    <p class="card-sub">Authorized access only.</p>
+    <div class="alert err" id="pw-error" style="display:none;">Incorrect password. Please try again.</div>
+    <div class="field">
+      <label>Password <span class="req">*</span></label>
+      <input type="password" id="pwInput" placeholder="Enter your password" onkeydown="if(event.key==='Enter') checkPassword()" autofocus>
+    </div>
+    <button class="btn btn-comic" onclick="checkPassword()">UNLOCK →</button>
+  </div>
+</div>
+
+<!-- PAT SETUP SCREEN -->
+<div class="screen" id="screen-setup">
+  <div class="card">
+    <div class="card-title">⚙️ GitHub Token Setup</div>
+    <p class="card-sub">Enter your GitHub Personal Access Token. Stored only in your browser.</p>
+    <div class="field">
+      <label>GitHub Personal Access Token <span class="req">*</span></label>
+      <input type="password" id="patInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" onkeydown="if(event.key==='Enter') savePAT()">
+      <p class="pat-hint">Go to <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a> → check <strong>repo</strong> scope → generate → paste here.</p>
+      <div class="pat-status" id="patStatus"></div>
+    </div>
+    <button class="btn btn-comic" onclick="savePAT()">SAVE & CONTINUE →</button>
+  </div>
+</div>
+
+<!-- MAIN SCREEN -->
+<div class="screen" id="screen-main">
+  <div class="settings-row">
+    <span style="font-family:'Caveat',cursive; color:var(--blue); font-size:1rem;">What would you like to add today?</span>
+    <button class="settings-btn" onclick="showSetup()">⚙️ Token</button>
+  </div>
+
+  <!-- MODE SELECTOR -->
+  <div class="card" style="margin-bottom:1.5rem;">
+    <div class="mode-grid">
+      <button class="mode-btn comic-btn active" onclick="selectMode('comic', this)">
+        <span class="mode-icon">📖</span>
+        COMIC
+      </button>
+      <button class="mode-btn blog-btn" onclick="selectMode('blog', this)">
+        <span class="mode-icon">📝</span>
+        BLOG
+      </button>
+      <button class="mode-btn char-btn" onclick="selectMode('character', this)">
+        <span class="mode-icon">🐾</span>
+        CHARACTER
+      </button>
+    </div>
+  </div>
+
+  <!-- COMIC FORM -->
+  <div class="form-panel active" id="panel-comic">
+    <div class="card">
+      <div class="card-title" style="color:var(--amber);">📖 New Comic Strip</div>
+      <p class="card-sub">Adds image to GitHub, updates captions.json and rss.xml automatically.</p>
+      <div class="alert err" id="comic-error"></div>
+      <div class="field"><label>Date <span class="req">*</span></label><input type="date" id="comicDate"></div>
+      <div class="field"><label>Episode Title <span class="req">*</span></label><input type="text" id="comicTitle" placeholder="e.g. ✨🐾 Well Bless Your Heart 🐾✨"></div>
+      <div class="field"><label>Tags <span class="opt">(comma separated)</span></label><input type="text" id="comicTags" placeholder="Southern, Honey Bear, chaos"></div>
+      <div class="field"><label>Description / Intro <span class="req">*</span></label><textarea id="comicIntro" placeholder="Write the episode introduction here…"></textarea></div>
+      <div class="field">
+        <label>Comic Strip Image <span class="req">*</span></label>
+        <div class="drop-zone" id="comicDropZone">
+          <input type="file" id="comicImageInput" accept="image/*" onchange="handleImageSelect('comic', this)">
+          <span class="drop-icon">🖼️</span>
+          <div class="drop-text">Drag & drop or <strong>click to browse</strong></div>
+          <div class="drop-text" style="margin-top:0.3rem;font-size:0.75rem;">PNG, JPEG, JPG supported</div>
+        </div>
+        <div class="preview-wrap" id="comicPreviewWrap"><img id="comicImagePreview" src="" alt=""><div class="preview-filename" id="comicPreviewFilename"></div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="progress-wrap" id="comic-progress">
+        <div class="progress-step" id="comic-step-image"><span class="step-icon" id="comic-icon-image">⬆️</span><span>Uploading image…</span></div>
+        <div class="progress-step" id="comic-step-captions"><span class="step-icon" id="comic-icon-captions">📄</span><span>Updating captions.json…</span></div>
+        <div class="progress-step" id="comic-step-rss"><span class="step-icon" id="comic-icon-rss">📡</span><span>Updating rss.xml…</span></div>
+      </div>
+      <div class="success-box" id="comic-success">
+        <span class="big-check">✅</span><h3>Comic Published!</h3>
+        <p id="comic-success-msg"></p>
+        <a id="comic-success-link" href="#" target="_blank" class="view-link">View Episode →</a>
+        <div style="margin-top:1rem;"><button class="btn btn-secondary" style="width:auto;padding:0.4rem 1.2rem;" onclick="resetForm('comic')">+ New Comic</button></div>
+      </div>
+      <button class="btn btn-comic" id="comic-submit" onclick="submitComic()">🚀 PUBLISH COMIC</button>
+    </div>
+  </div>
+
+  <!-- BLOG FORM -->
+  <div class="form-panel" id="panel-blog">
+    <div class="card">
+      <div class="card-title" style="color:var(--blue);">📝 New Blog Post</div>
+      <p class="card-sub">Updates blog.json. Place newest at top or insert by date.</p>
+      <div class="alert err" id="blog-error"></div>
+      <div class="field"><label>Date <span class="req">*</span></label><input type="date" id="blogDate"></div>
+      <div class="field"><label>Title <span class="req">*</span></label><input type="text" id="blogTitle" placeholder="e.g. 🚨 Big News from Summerville!" oninput="document.getElementById('blogSlug').value=toSlug(this.value)"></div>
+      <div class="field"><label>URL Slug <span class="req">*</span></label><input type="text" id="blogSlug" placeholder="big-news-from-summerville"></div>
+      <div class="field">
+        <label>YouTube Video ID <span class="opt">(optional)</span></label>
+        <input type="text" id="blogYoutube" placeholder="e.g. kF31oGKbnnQ" oninput="previewYoutube(this.value)">
+        <div class="youtube-preview" id="youtubePreview"><iframe id="youtubePreviewFrame" src="" allowfullscreen></iframe></div>
+      </div>
+      <div class="field"><label>Tags <span class="opt">(comma separated)</span></label><input type="text" id="blogTags" placeholder="AI, Facebook, Summerville"><div class="tag-hint">Appear as #hashtag badges</div></div>
+      <div class="field"><label>Body Text <span class="req">*</span></label><textarea id="blogBody" placeholder="Write your blog post. Blank lines = new paragraphs."></textarea></div>
+      <div class="field">
+        <label>Cover Image <span class="opt">(optional if YouTube provided)</span></label>
+        <div class="drop-zone" id="blogDropZone">
+          <input type="file" id="blogImageInput" accept="image/*" onchange="handleImageSelect('blog', this)">
+          <span class="drop-icon">🖼️</span>
+          <div class="drop-text">Drag & drop or <strong>click to browse</strong></div>
+        </div>
+        <div class="preview-wrap" id="blogPreviewWrap"><img id="blogImagePreview" src="" alt=""><div class="preview-filename" id="blogPreviewFilename"></div></div>
+      </div>
+      <div class="field">
+        <label>Placement</label>
+        <select id="blogPlacement"><option value="top">Top of list (newest)</option><option value="bydate">Insert by date order</option></select>
+      </div>
+      <div class="divider"></div>
+      <div class="progress-wrap" id="blog-progress">
+        <div class="progress-step" id="blog-step-image"><span class="step-icon" id="blog-icon-image">⬆️</span><span>Uploading image…</span></div>
+        <div class="progress-step" id="blog-step-json"><span class="step-icon" id="blog-icon-json">📝</span><span>Updating blog.json…</span></div>
+        <div class="progress-step" id="blog-step-rss"><span class="step-icon" id="blog-icon-rss">📡</span><span>Updating rss.xml…</span></div>
+      </div>
+      <div class="success-box" id="blog-success">
+        <span class="big-check">✅</span><h3>Post Published!</h3>
+        <p id="blog-success-msg"></p>
+        <a id="blog-success-link" href="#" target="_blank" class="view-link">View Post →</a>
+        <div style="margin-top:1rem;"><button class="btn btn-secondary" style="width:auto;padding:0.4rem 1.2rem;" onclick="resetForm('blog')">+ New Post</button></div>
+      </div>
+      <button class="btn btn-blog" id="blog-submit" onclick="submitBlog()">🚀 PUBLISH POST</button>
+    </div>
+  </div>
+
+  <!-- CHARACTER FORM -->
+  <div class="form-panel" id="panel-character">
+    <div class="card">
+      <div class="card-title" style="color:var(--purple);">🐾 New Character</div>
+      <p class="card-sub">Adds a new character to characters.json with image, name, tags and description.</p>
+      <div class="alert err" id="char-error"></div>
+      <div class="field"><label>Character Name <span class="req">*</span></label><input type="text" id="charName" placeholder="e.g. Nimble Nut the Squirrel"></div>
+      <div class="field"><label>Tags <span class="opt">(comma separated — first tag shown on card)</span></label><input type="text" id="charTags" placeholder="Recurring, Squirrel, Troublemaker"></div>
+      <div class="field"><label>Description <span class="req">*</span></label><textarea id="charDesc" placeholder="Write the character bio here…"></textarea></div>
+      <div class="field">
+        <label>Character Image <span class="req">*</span></label>
+        <div class="drop-zone" id="charDropZone">
+          <input type="file" id="charImageInput" accept="image/*" onchange="handleImageSelect('char', this)">
+          <span class="drop-icon">🖼️</span>
+          <div class="drop-text">Drag & drop or <strong>click to browse</strong></div>
+          <div class="drop-text" style="margin-top:0.3rem;font-size:0.75rem;">Square images work best</div>
+        </div>
+        <div class="preview-wrap" id="charPreviewWrap"><img id="charImagePreview" src="" alt=""><div class="preview-filename" id="charPreviewFilename"></div></div>
+      </div>
+      <div class="field">
+        <label>Position in List</label>
+        <select id="charPosition"><option value="end">Add to end of list</option><option value="start">Add to beginning of list</option></select>
+      </div>
+      <div class="divider"></div>
+      <div class="progress-wrap" id="char-progress">
+        <div class="progress-step" id="char-step-image"><span class="step-icon" id="char-icon-image">⬆️</span><span>Uploading character image…</span></div>
+        <div class="progress-step" id="char-step-json"><span class="step-icon" id="char-icon-json">🐾</span><span>Updating characters.json…</span></div>
+        <div class="progress-step" id="char-step-rss"><span class="step-icon" id="char-icon-rss">📡</span><span>Updating rss.xml…</span></div>
+      </div>
+      <div class="success-box" id="char-success">
+        <span class="big-check">✅</span><h3>Character Added!</h3>
+        <p id="char-success-msg"></p>
+        <a href="https://sisters-of-summerville.github.io/#characters" target="_blank" class="view-link">View Characters →</a>
+        <div style="margin-top:1rem;"><button class="btn btn-secondary" style="width:auto;padding:0.4rem 1.2rem;" onclick="resetForm('char')">+ New Character</button></div>
+      </div>
+      <button class="btn btn-char" id="char-submit" onclick="submitCharacter()">🚀 ADD CHARACTER</button>
+    </div>
+  </div>
+
+</div><!-- /screen-main -->
+
+<div class="app-footer">Sisters of Summerville Admin · Authorized use only</div>
+
+<script>
+// ══════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════
+const CONFIG = {
+  password:  'P@ss4sos!',
+  repoOwner: 'sisters-of-summerville',
+  repoName:  'sisters-of-summerville.github.io',
+  branch:    'main',
+  siteUrl:   'https://sisters-of-summerville.github.io'
+};
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+const imageState = { comic: { file: null, b64: null }, blog: { file: null, b64: null }, char: { file: null, b64: null } };
+let isSubmitting = false;
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+window.addEventListener('load', () => {
+  // Set today's date on all date fields
+  const today = new Date();
+  const yyyy = today.getFullYear(), mm = String(today.getMonth()+1).padStart(2,'0'), dd = String(today.getDate()).padStart(2,'0');
+  const dateStr = `${yyyy}-${mm}-${dd}`;
+  ['comicDate','blogDate'].forEach(id => { const el = document.getElementById(id); if(el) el.value = dateStr; });
+
+  // Setup drag & drop for all zones
+  ['comic','blog','char'].forEach(prefix => {
+    const dz = document.getElementById(`${prefix}DropZone`);
+    if (!dz) return;
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('dragover');
+      const f = e.dataTransfer.files[0];
+      if (f && f.type.startsWith('image/')) processImage(prefix, f);
+    });
+  });
+
+  // Check session
+  if (sessionStorage.getItem('sos_admin_unlocked') === 'yes') {
+    unlockApp();
+  }
+});
+
+// ══════════════════════════════════════════
+//  PASSWORD
+// ══════════════════════════════════════════
+function checkPassword() {
+  const val = document.getElementById('pwInput').value;
+  if (val === CONFIG.password) {
+    sessionStorage.setItem('sos_admin_unlocked', 'yes');
+    unlockApp();
+  } else {
+    const err = document.getElementById('pw-error');
+    err.style.display = 'block';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+    setTimeout(() => { err.style.display = 'none'; }, 3000);
+  }
+}
+
+function unlockApp() {
+  document.getElementById('screen-password').classList.remove('active');
+  if (localStorage.getItem('sos_pat')) {
+    document.getElementById('screen-main').classList.add('active');
+  } else {
+    document.getElementById('screen-setup').classList.add('active');
+  }
+}
+
+// ══════════════════════════════════════════
+//  PAT
+// ══════════════════════════════════════════
+async function savePAT() {
+  const pat = document.getElementById('patInput').value.trim();
+  if (!pat) return;
+  const status = document.getElementById('patStatus');
+  status.className = 'pat-status ok'; status.style.display = 'block';
+  status.textContent = 'Verifying…';
+  try {
+    const res = await fetch(`https://api.github.com/repos/${CONFIG.repoOwner}/${CONFIG.repoName}`, {
+      headers: { 'Authorization': `Bearer ${pat}`, 'Accept': 'application/vnd.github+json' }
+    });
+    if (res.ok) {
+      localStorage.setItem('sos_pat', pat);
+      status.textContent = '✅ Token verified!';
+      setTimeout(() => {
+        document.getElementById('screen-setup').classList.remove('active');
+        document.getElementById('screen-main').classList.add('active');
+      }, 800);
+    } else {
+      status.className = 'pat-status err'; status.style.display = 'block';
+      status.textContent = '❌ Token invalid or lacks repo access.';
+    }
+  } catch(e) {
+    status.className = 'pat-status err'; status.style.display = 'block';
+    status.textContent = '❌ Network error.';
+  }
+}
+
+function showSetup() {
+  document.getElementById('screen-main').classList.remove('active');
+  document.getElementById('screen-setup').classList.add('active');
+  document.getElementById('patInput').value = '';
+  document.getElementById('patStatus').style.display = 'none';
+}
+
+// ══════════════════════════════════════════
+//  MODE SELECTOR
+// ══════════════════════════════════════════
+function selectMode(mode, btn) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${mode}`).classList.add('active');
+}
+
+// ══════════════════════════════════════════
+//  IMAGE HANDLING
+// ══════════════════════════════════════════
+function handleImageSelect(prefix, input) {
+  if (input.files && input.files[0]) processImage(prefix, input.files[0]);
+}
+
+function processImage(prefix, file) {
+  imageState[prefix].file = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    imageState[prefix].b64 = e.target.result.split(',')[1];
+    document.getElementById(`${prefix}ImagePreview`).src = e.target.result;
+    document.getElementById(`${prefix}PreviewFilename`).textContent = '📎 ' + file.name;
+    document.getElementById(`${prefix}PreviewWrap`).style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══════════════════════════════════════════
+//  YOUTUBE PREVIEW
+// ══════════════════════════════════════════
+let ytTimer;
+function previewYoutube(id) {
+  clearTimeout(ytTimer);
+  const wrap = document.getElementById('youtubePreview');
+  const frame = document.getElementById('youtubePreviewFrame');
+  if (!id.trim()) { wrap.style.display = 'none'; frame.src = ''; return; }
+  ytTimer = setTimeout(() => { frame.src = `https://www.youtube.com/embed/${id.trim()}`; wrap.style.display = 'block'; }, 800);
+}
+
+// ══════════════════════════════════════════
+//  GITHUB API
+// ══════════════════════════════════════════
+const getPAT  = () => localStorage.getItem('sos_pat');
+const apiBase = () => `https://api.github.com/repos/${CONFIG.repoOwner}/${CONFIG.repoName}/contents`;
+
+async function getFile(path) {
+  const res = await fetch(`${apiBase()}/${path}`, {
+    headers: { 'Authorization': `Bearer ${getPAT()}`, 'Accept': 'application/vnd.github+json' }
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+async function putFile(path, b64, msg, sha = null) {
+  const body = { message: msg, content: b64, branch: CONFIG.branch };
+  if (sha) body.sha = sha;
+  const res = await fetch(`${apiBase()}/${path}`, {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${getPAT()}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.message || `HTTP ${res.status}`); }
+  return res.json();
+}
+
+function decodeB64(str) { return decodeURIComponent(escape(atob(str.replace(/\n/g,'')))); }
+function encodeB64(str) { return btoa(unescape(encodeURIComponent(str))); }
+
+function toSlug(str) {
+  return str.toLowerCase().replace(/['']/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
+
+function formatPubDate(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00Z');
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const mons = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dd = String(d.getUTCDate()).padStart(2,'0');
+  return `${days[d.getUTCDay()]}, ${dd} ${mons[d.getUTCMonth()]} ${d.getUTCFullYear()} 12:00:00 +0000`;
+}
+
+function escapeXml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+}
+
+// ══════════════════════════════════════════
+//  STEP UI
+// ══════════════════════════════════════════
+function stepActive(prefix, id) { document.getElementById(`${prefix}-step-${id}`).classList.add('active'); document.getElementById(`${prefix}-icon-${id}`).innerHTML = '<span class="step-spin">⏳</span>'; }
+function stepDone(prefix, id)   { const s = document.getElementById(`${prefix}-step-${id}`); s.classList.remove('active'); s.classList.add('done'); document.getElementById(`${prefix}-icon-${id}`).textContent = '✅'; }
+function stepError(prefix, id)  { const s = document.getElementById(`${prefix}-step-${id}`); s.classList.remove('active'); s.classList.add('error'); document.getElementById(`${prefix}-icon-${id}`).textContent = '❌'; }
+
+function showError(prefix, msg) {
+  const el = document.getElementById(`${prefix}-error`);
+  el.textContent = msg; el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 8000);
+}
+
+// ══════════════════════════════════════════
+//  SUBMIT COMIC
+// ══════════════════════════════════════════
+async function submitComic() {
+  if (isSubmitting) return;
+  const dateVal = document.getElementById('comicDate').value.trim();
+  const title   = document.getElementById('comicTitle').value.trim();
+  const intro   = document.getElementById('comicIntro').value.trim();
+  const tagsRaw = document.getElementById('comicTags').value.trim();
+  if (!dateVal) { showError('comic','⚠️ Please enter a date.'); return; }
+  if (!title)   { showError('comic','⚠️ Please enter a title.'); return; }
+  if (!intro)   { showError('comic','⚠️ Please enter a description.'); return; }
+  if (!imageState.comic.file) { showError('comic','⚠️ Please select an image.'); return; }
+
+  const tags      = tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : [];
+  const ext       = imageState.comic.file.name.split('.').pop();
+  const year      = dateVal.slice(0,4);
+  const imagePath = `images/${year}/${dateVal}.${ext}`;
+  const episodeUrl = `${CONFIG.siteUrl}/#${dateVal}`;
+
+  isSubmitting = true;
+  document.getElementById('comic-submit').disabled = true;
+  document.getElementById('comic-progress').style.display = 'flex';
+
+  try {
+    stepActive('comic','image');
+    await putFile(imagePath, imageState.comic.b64, `Add comic image for ${dateVal}`);
+    stepDone('comic','image');
+
+    stepActive('comic','captions');
+    const captionsFile = await getFile('captions.json');
+    if (!captionsFile) throw new Error('Could not read captions.json');
+    const captions = JSON.parse(decodeB64(captionsFile.content));
+    captions.unshift({ date: dateVal, title, image: imagePath, tags, intro });
+    await putFile('captions.json', encodeB64(JSON.stringify(captions, null, 2)), `Add "${title}" to captions.json`, captionsFile.sha);
+    stepDone('comic','captions');
+
+    stepActive('comic','rss');
+    const rssFile = await getFile('rss.xml');
+    if (!rssFile) throw new Error('Could not read rss.xml');
+    let rssXml = decodeB64(rssFile.content);
+    const imageUrl = `${CONFIG.siteUrl}/${imagePath}`;
+    const imgHtml  = `<img src="${imageUrl}" alt="${escapeXml(title)}" style="max-width:100%;border-radius:8px;margin-bottom:12px;"/><br/>`;
+    const newItem  = `\n    <item>\n      <title>${escapeXml(title)}</title>\n      <link>${episodeUrl}</link>\n      <description><![CDATA[${imgHtml}${intro}<br/><br/><a href="${episodeUrl}">👉 Read this episode on the Sisters of Summerville website</a>]]></description>\n      <enclosure url="${imageUrl}" type="image/jpeg" length="0"/>\n      <pubDate>${formatPubDate(dateVal)}</pubDate>\n      <guid>${episodeUrl}</guid>\n    </item>`;
+    const insertAt = rssXml.includes('<item>') ? rssXml.indexOf('<item>') : rssXml.indexOf('</channel>');
+    rssXml = rssXml.slice(0, insertAt) + newItem + '\n    ' + rssXml.slice(insertAt);
+    await putFile('rss.xml', encodeB64(rssXml), `Add "${title}" to rss.xml`, rssFile.sha);
+    stepDone('comic','rss');
+
+    document.getElementById('comic-success-msg').textContent = `"${title}" published for ${dateVal}. Site updates in ~2 minutes.`;
+    document.getElementById('comic-success-link').href = episodeUrl;
+    document.getElementById('comic-success').style.display = 'block';
+    document.getElementById('comic-submit').style.display  = 'none';
+  } catch(err) {
+    ['image','captions','rss'].forEach(id => { if (document.getElementById(`comic-step-${id}`).classList.contains('active')) stepError('comic',id); });
+    showError('comic', `❌ ${err.message}`);
+    document.getElementById('comic-submit').disabled = false;
+  }
+  isSubmitting = false;
+}
+
+// ══════════════════════════════════════════
+//  SUBMIT BLOG
+// ══════════════════════════════════════════
+async function submitBlog() {
+  if (isSubmitting) return;
+  const dateVal   = document.getElementById('blogDate').value.trim();
+  const title     = document.getElementById('blogTitle').value.trim();
+  const slug      = document.getElementById('blogSlug').value.trim();
+  const body      = document.getElementById('blogBody').value.trim();
+  const youtube   = document.getElementById('blogYoutube').value.trim();
+  const tagsRaw   = document.getElementById('blogTags').value.trim();
+  const placement = document.getElementById('blogPlacement').value;
+  if (!dateVal) { showError('blog','⚠️ Please enter a date.'); return; }
+  if (!title)   { showError('blog','⚠️ Please enter a title.'); return; }
+  if (!slug)    { showError('blog','⚠️ Please enter a URL slug.'); return; }
+  if (!body)    { showError('blog','⚠️ Please enter the body text.'); return; }
+  if (!youtube && !imageState.blog.file) { showError('blog','⚠️ Please add a YouTube ID or upload an image.'); return; }
+
+  const tags = tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : [];
+  isSubmitting = true;
+  document.getElementById('blog-submit').disabled = true;
+  document.getElementById('blog-progress').style.display = 'flex';
+
+  try {
+    let imagePath = '';
+    if (imageState.blog.file) {
+      stepActive('blog','image');
+      const ext = imageState.blog.file.name.split('.').pop();
+      imagePath = `images/blog/${slug}.${ext}`;
+      await putFile(imagePath, imageState.blog.b64, `Add blog image for ${slug}`);
+      stepDone('blog','image');
+    } else {
+      document.getElementById('blog-step-image').style.display = 'none';
+    }
+
+    stepActive('blog','json');
+    const blogFile = await getFile('blog.json');
+    if (!blogFile) throw new Error('Could not read blog.json');
+    const posts = JSON.parse(decodeB64(blogFile.content));
+    if (posts.find(p => p.slug === slug)) throw new Error(`Slug "${slug}" already exists.`);
+
+    const newPost = { slug, date: dateVal, title, tags, body };
+    if (youtube)   newPost.youtube = youtube;
+    if (imagePath) newPost.image   = imagePath;
+
+    if (placement === 'top') { posts.unshift(newPost); }
+    else {
+      const idx = posts.findIndex(p => p.date <= dateVal);
+      if (idx === -1) { posts.push(newPost); } else { posts.splice(idx, 0, newPost); }
+    }
+    await putFile('blog.json', encodeB64(JSON.stringify(posts, null, 2)), `Add blog post: ${title}`, blogFile.sha);
+    stepDone('blog','json');
+
+    // Update RSS
+    stepActive('blog','rss');
+    const blogRssFile = await getFile('rss.xml');
+    if (blogRssFile) {
+      let rssXml = decodeB64(blogRssFile.content);
+      const postUrl  = `${CONFIG.siteUrl}/#blog/${slug}`;
+      const imgHtml  = imagePath ? `<img src="${CONFIG.siteUrl}/${imagePath}" alt="${escapeXml(title)}" style="max-width:100%;border-radius:8px;margin-bottom:12px;"/><br/>` : '';
+      const bodySnip = body.substring(0, 300) + (body.length > 300 ? '…' : '');
+      const newItem  = `\n    <item>\n      <title>${escapeXml(title)}</title>\n      <link>${postUrl}</link>\n      <description><![CDATA[${imgHtml}${bodySnip}<br/><br/><a href="${postUrl}">👉 Read full post on Sisters of Summerville</a>]]></description>\n      <pubDate>${formatPubDate(dateVal)}</pubDate>\n      <guid>${postUrl}</guid>\n    </item>`;
+      const insertAt = rssXml.includes('<item>') ? rssXml.indexOf('<item>') : rssXml.indexOf('</channel>');
+      rssXml = rssXml.slice(0, insertAt) + newItem + '\n    ' + rssXml.slice(insertAt);
+      await putFile('rss.xml', encodeB64(rssXml), `Add blog RSS entry: ${title}`, blogRssFile.sha);
+    }
+    stepDone('blog','rss');
+
+    const postUrl = `${CONFIG.siteUrl}/#blog/${slug}`;
+    document.getElementById('blog-success-msg').textContent = `"${title}" published for ${dateVal}.`;
+    document.getElementById('blog-success-link').href = postUrl;
+    document.getElementById('blog-success').style.display = 'block';
+    document.getElementById('blog-submit').style.display  = 'none';
+  } catch(err) {
+    ['image','json'].forEach(id => { if (document.getElementById(`blog-step-${id}`)?.classList.contains('active')) stepError('blog',id); });
+    showError('blog', `❌ ${err.message}`);
+    document.getElementById('blog-submit').disabled = false;
+  }
+  isSubmitting = false;
+}
+
+// ══════════════════════════════════════════
+//  SUBMIT CHARACTER
+// ══════════════════════════════════════════
+async function submitCharacter() {
+  if (isSubmitting) return;
+  const name     = document.getElementById('charName').value.trim();
+  const desc     = document.getElementById('charDesc').value.trim();
+  const tagsRaw  = document.getElementById('charTags').value.trim();
+  const position = document.getElementById('charPosition').value;
+  if (!name)  { showError('char','⚠️ Please enter a character name.'); return; }
+  if (!desc)  { showError('char','⚠️ Please enter a description.'); return; }
+  if (!imageState.char.file) { showError('char','⚠️ Please upload a character image.'); return; }
+
+  const tags = tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : [];
+  const slug = toSlug(name);
+  const ext  = imageState.char.file.name.split('.').pop();
+  const imagePath = `characters/${slug}.${ext}`;
+
+  isSubmitting = true;
+  document.getElementById('char-submit').disabled = true;
+  document.getElementById('char-progress').style.display = 'flex';
+
+  try {
+    stepActive('char','image');
+    await putFile(imagePath, imageState.char.b64, `Add character image for ${name}`);
+    stepDone('char','image');
+
+    stepActive('char','json');
+    const charFile = await getFile('characters.json');
+    if (!charFile) throw new Error('Could not read characters.json');
+    const chars = JSON.parse(decodeB64(charFile.content));
+    if (chars.find(c => toSlug(c.name) === slug)) throw new Error(`Character "${name}" already exists.`);
+
+    const newChar = { name, image: imagePath, tags, description: desc };
+    if (position === 'start') { chars.unshift(newChar); } else { chars.push(newChar); }
+    await putFile('characters.json', encodeB64(JSON.stringify(chars, null, 2)), `Add character: ${name}`, charFile.sha);
+    stepDone('char','json');
+
+    // Update RSS
+    stepActive('char','rss');
+    const charRssFile = await getFile('rss.xml');
+    if (charRssFile) {
+      let rssXml = decodeB64(charRssFile.content);
+      const charUrl = `${CONFIG.siteUrl}/#character/${slug}`;
+      const imgHtml = `<img src="${CONFIG.siteUrl}/${imagePath}" alt="${escapeXml(name)}" style="max-width:100%;border-radius:8px;margin-bottom:12px;"/><br/>`;
+      const descSnip = desc.substring(0, 300) + (desc.length > 300 ? '…' : '');
+      const today = new Date();
+      const newItem = `\n    <item>\n      <title>New Character: ${escapeXml(name)}</title>\n      <link>${charUrl}</link>\n      <description><![CDATA[${imgHtml}Meet ${escapeXml(name)}! ${descSnip}<br/><br/><a href="${charUrl}">👉 Meet ${escapeXml(name)} on the Sisters of Summerville website</a>]]></description>\n      <pubDate>${formatPubDate(today.toISOString().slice(0,10))}</pubDate>\n      <guid>${charUrl}</guid>\n    </item>`;
+      const insertAt = rssXml.includes('<item>') ? rssXml.indexOf('<item>') : rssXml.indexOf('</channel>');
+      rssXml = rssXml.slice(0, insertAt) + newItem + '\n    ' + rssXml.slice(insertAt);
+      await putFile('rss.xml', encodeB64(rssXml), `Add character RSS entry: ${name}`, charRssFile.sha);
+    }
+    stepDone('char','rss');
+
+    document.getElementById('char-success-msg').textContent = `${name} has been added to the Characters page!`;
+    document.getElementById('char-success').style.display = 'block';
+    document.getElementById('char-submit').style.display  = 'none';
+  } catch(err) {
+    ['image','json'].forEach(id => { if (document.getElementById(`char-step-${id}`)?.classList.contains('active')) stepError('char',id); });
+    showError('char', `❌ ${err.message}`);
+    document.getElementById('char-submit').disabled = false;
+  }
+  isSubmitting = false;
+}
+
+// ══════════════════════════════════════════
+//  RESET
+// ══════════════════════════════════════════
+function resetForm(prefix) {
+  const today = new Date();
+  const yyyy = today.getFullYear(), mm = String(today.getMonth()+1).padStart(2,'0'), dd = String(today.getDate()).padStart(2,'0');
+
+  if (prefix === 'comic') {
+    ['comicTitle','comicIntro','comicTags'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('comicDate').value = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('comic-progress').style.display = 'none';
+    document.getElementById('comic-success').style.display  = 'none';
+    document.getElementById('comic-submit').style.display   = 'block';
+    document.getElementById('comic-submit').disabled        = false;
+    document.getElementById('comicImageInput').value        = '';
+    document.getElementById('comicPreviewWrap').style.display = 'none';
+    ['image','captions','rss'].forEach(id => { const s = document.getElementById(`comic-step-${id}`); s.className='progress-step'; s.style.display=''; document.getElementById(`comic-icon-${id}`).textContent = id==='image'?'⬆️':id==='captions'?'📄':'📡'; });
+    imageState.comic = { file: null, b64: null };
+  } else if (prefix === 'blog') {
+    ['blogTitle','blogSlug','blogBody','blogTags','blogYoutube'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('blogDate').value = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('blog-progress').style.display = 'none';
+    document.getElementById('blog-success').style.display  = 'none';
+    document.getElementById('blog-submit').style.display   = 'block';
+    document.getElementById('blog-submit').disabled        = false;
+    document.getElementById('blogImageInput').value        = '';
+    document.getElementById('blogPreviewWrap').style.display = 'none';
+    document.getElementById('youtubePreview').style.display = 'none';
+    document.getElementById('blog-step-image').style.display = '';
+    ['image','json','rss'].forEach(id => { const s = document.getElementById(`blog-step-${id}`); if(s){ s.className='progress-step'; s.style.display=''; } const ic = document.getElementById(`blog-icon-${id}`); if(ic) ic.textContent = id==='image'?'⬆️':id==='json'?'📝':'📡'; });
+    imageState.blog = { file: null, b64: null };
+  } else if (prefix === 'char') {
+    ['charName','charDesc','charTags'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('char-progress').style.display = 'none';
+    document.getElementById('char-success').style.display  = 'none';
+    document.getElementById('char-submit').style.display   = 'block';
+    document.getElementById('char-submit').disabled        = false;
+    document.getElementById('charImageInput').value        = '';
+    document.getElementById('charPreviewWrap').style.display = 'none';
+    ['image','json','rss'].forEach(id => { const s = document.getElementById(`char-step-${id}`); if(s){ s.className='progress-step'; } const ic = document.getElementById(`char-icon-${id}`); if(ic) ic.textContent = id==='image'?'⬆️':id==='json'?'🐾':'📡'; });
+    imageState.char = { file: null, b64: null };
+  }
+  isSubmitting = false;
+}
+</script>
+</body>
+</html>

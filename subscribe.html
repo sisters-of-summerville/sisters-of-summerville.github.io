@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subscribe — Sisters of Summerville</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:   #0a0808;
+    --bg-mid:    #131010;
+    --bg-card:   #1c1818;
+    --amber:     #f5a623;
+    --amber2:    #ff9900;
+    --blue:      #3ab5ff;
+    --text:      #f0eaf8;
+    --muted:     #8a7f7f;
+    --border:    #2a2020;
+    --border-l:  #3d2f20;
+    --radius:    12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── BANNER ── */
+  .site-banner {
+    width: 100%; background: #000;
+    text-align: center; padding: 0.5rem 0 0; line-height: 0;
+  }
+  .site-banner a { display: inline-block; cursor: pointer; }
+  .site-banner img { max-width: 420px; width: 80%; height: auto; display: inline-block; }
+
+  /* ── MAIN ── */
+  main {
+    width: 100%; max-width: 520px;
+    padding: 2.5rem 1.5rem 3rem;
+    display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+  }
+
+  /* ── HERO TEXT ── */
+  .hero { text-align: center; }
+  .hero h1 {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2rem, 6vw, 3rem);
+    letter-spacing: 0.05em;
+    background: linear-gradient(135deg, #ffe0a0, var(--amber));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+  .hero p {
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .hero .pets { font-size: 2rem; margin-bottom: 0.5rem; }
+
+  /* ── FOLLOW.IT FORM WRAPPER ── */
+  .form-wrapper {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-l);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+
+  /* Override follow.it styles to match dark theme */
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview {
+    display: flex !important; flex-direction: column !important;
+    justify-content: center !important; margin-top: 0 !important;
+    padding: 0 !important; max-width: none !important;
+    border-radius: 0 !important; box-shadow: none !important;
+    background-color: transparent !important;
+    border: none !important;
+  }
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview,
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview * {
+    box-sizing: border-box !important;
+  }
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview .preview-heading { width: 100% !important; }
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview .preview-heading h5 {
+    margin-top: 0 !important; margin-bottom: 0 !important;
+  }
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview .preview-input-field {
+    margin-top: 16px !important; width: 100% !important;
+  }
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview .preview-input-field input {
+    width: 100% !important; height: 44px !important;
+    border-radius: 9px !important; border: 1px solid #3d2f20 !important;
+    background-color: #131010 !important; outline: none !important;
+    color: #f0eaf8 !important; font-family: "Arial" !important;
+    font-size: 15px !important; text-align: center !important;
+  }
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview .preview-input-field input::placeholder {
+    color: #8a7f7f !important; opacity: 1 !important;
+  }
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview .preview-submit-button {
+    margin-top: 10px !important; width: 100% !important;
+  }
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview .preview-submit-button button {
+    width: 100% !important; height: 44px !important;
+    border: 0 !important; border-radius: 9px !important;
+    line-height: 0 !important; cursor: pointer !important;
+    font-family: "Bangers", cursive !important;
+    font-size: 1.2rem !important; letter-spacing: 0.08em !important;
+    background: linear-gradient(135deg, #ff9900, #f5a623) !important;
+    color: #0a0808 !important;
+  }
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .powered-by-line {
+    color: #8a7f7f !important; font-family: "Arial" !important;
+    font-size: 12px !important; font-weight: 400 !important;
+    text-align: center !important; text-decoration: none !important;
+    display: flex !important; width: 100% !important;
+    justify-content: center !important; align-items: center !important;
+    margin-top: 10px !important;
+  }
+  .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .powered-by-line img {
+    margin-left: 8px !important; height: 1.1em !important;
+  }
+
+  /* ── PERKS ── */
+  .perks {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .perk {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+  }
+  .perk-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+  /* ── BACK LINK ── */
+  .back-link {
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--amber); }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: auto;
+    text-align: center;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.9;
+    width: 100%;
+  }
+  footer a { color: var(--amber); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .footer-tags { font-size: 0.68rem; opacity: 0.4; margin-top: 0.2rem; }
+</style>
+</head>
+<body>
+
+<!-- BANNER -->
+<div class="site-banner">
+  <a href="https://sisters-of-summerville.github.io/">
+    <img src="sos-banner.png" alt="Sisters of Summerville"
+         onerror="this.style.display='none'">
+  </a>
+</div>
+
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="pets">🐶🐱</div>
+    <h1>Never Miss an Episode!</h1>
+    <p>Get Honey Bear and Bootsie Belle's latest adventures delivered straight to your inbox — a new comic every single day.</p>
+  </div>
+
+  <!-- FOLLOW.IT FORM -->
+  <div class="form-wrapper">
+    <div class="followit--follow-form-container" attr-a attr-b attr-c attr-d attr-e attr-f>
+      <form action="https://api.follow.it/subscription-form/bEVuMllZOE1uNElnR0NpTjMvcXB1VytLQURkQ2I0MklBc3FaZm1wMlFhbERCcktVOWJDMHpQQlpmQ3N3QmxqU2FtM0tybjAvZGFnQnFzNVY4aWRveVJRVVlWdHJ5cUN1a3Z0c3I3dWRQenBWUUFCSGtySFBNa2lnQkRIUzI5VDh8ajVZbm5WUWN4NEcrNXpmY0ZQbXlPRVhxWnBTUWhmL0RxNjA2U2d3UmtNST0=/8" method="post">
+        <div class="form-preview" style="background-color:transparent; border:none;">
+          <div class="preview-heading">
+            <h5 style="font-family:Bangers,cursive; font-weight:bold; color:#f0eaf8; font-size:22px; text-align:center; letter-spacing:0.05em;">Subscribe for free — daily comic strips by email:</h5>
+          </div>
+          <div class="preview-input-field">
+            <input type="email" name="email" required placeholder="Enter your email address" spellcheck="false">
+          </div>
+          <div class="preview-submit-button">
+            <button type="submit">🐾 SUBSCRIBE FREE</button>
+          </div>
+        </div>
+      </form>
+      <a href="https://follow.it" class="powered-by-line" target="_blank">Powered by <img src="https://follow.it/images/colored-logo.svg" alt="follow.it" height="14px"/></a>
+    </div>
+  </div>
+
+  <!-- PERKS -->
+  <div class="perks">
+    <div class="perk"><span class="perk-icon">📬</span><span>New comic delivered to your inbox every day</span></div>
+    <div class="perk"><span class="perk-icon">🆓</span><span>Completely free — no credit card needed</span></div>
+    <div class="perk"><span class="perk-icon">🚫</span><span>No spam, ever — unsubscribe anytime in one click</span></div>
+    <div class="perk"><span class="perk-icon">🐶🐱</span><span>Honey Bear & Bootsie Belle chaos, straight to you</span></div>
+  </div>
+
+  <!-- BACK LINK -->
+  <a class="back-link" href="https://sisters-of-summerville.github.io/">
+    ◀ Back to all comics
+  </a>
+
+</main>
+
+<footer>
+  <div>🐾 <strong>Sisters of Summerville</strong> · Daily Comic Strip · Summerville, SC</div>
+  <div>Creative partnership between Artist + AI</div>
+  <div class="footer-tags">#SistersOfSummerville #YorkieLife #TuxedoCat #PetComedy #AIChaos</div>
+</footer>
+
+</body>
+</html>
