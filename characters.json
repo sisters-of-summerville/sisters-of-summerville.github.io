@@ -1,0 +1,314 @@
+[
+  {
+    "name": "Honey Bear",
+    "image": "characters/honey-bear.png",
+    "tags": [
+      "Main Character",
+      "Yorkie",
+      "Energetic",
+      "Hero"
+    ],
+    "description": "A sweet, enthusiastic, and slightly chaotic sassy Yorkie who tackles every situation with maximum energy and minimum caution. Originally from Indiana, she's still learning the ways of Southern living — one disaster at a time. Honey Bear is all energy, optimism, and impulsive decisions. She dives headfirst into every situation with enthusiasm, whether she understands it or not, often turning simple moments into full-blown chaos. Honey Bear is a small Yorkie with a big personality and an even bigger pink bow. "
+  },
+  {
+    "name": "Bootsie Belle",
+    "image": "characters/bootsie-belle.png",
+    "tags": [
+      "Main Character",
+      "Tuxedo Cat",
+      "Schemer",
+      "Sassy",
+      "Mastermind"
+    ],
+    "description": "The scheming, sophisticated, and perpetually unimpressed tuxedo cat who is a one day younger sister to Honey Bear. Bootsie Belle is always three steps ahead, whether she's launching a cyber-intrusion from behind the couch or simply judging everyone from the highest shelf. Cool, calculated, and always in control, Bootsie Belle is the sharp-tongued tuxedo cat who runs things…whether anyone realizes it or not. With her red collar and gold bell, she observes, judges, and delivers perfectly timed Southern sass."
+  },
+  {
+    "name": "Spot the Hairless Cat",
+    "image": "characters/spot.png",
+    "tags": [
+      "Oddball",
+      "Hairless Cat"
+    ],
+    "description": "With a strange and unforgettable presence, Spot shows up with unpredictable energy and personality that’s just as bold as their appearance. You never quite know what you’re going to get, which is exactly the point. Spot is a hairless cat whose appearance is only matched by the intensity of his personality."
+  },
+  {
+    "name": "Hershey the Yorkie Biker Pup",
+    "image": "characters/hershey.png",
+    "tags": [
+      "Biker",
+      "Yorkie",
+      "Rebel",
+      "Cool Kid"
+    ],
+    "description": "The coolest pup on two wheels. Hershey rolls into Summerville with attitude, a leather jacket, and absolutely zero interest in following the rules. Hershey rolls through Summerville like he owns the streets, bringing cool confidence and just enough chaos to keep things interesting."
+  },
+  {
+    "name": "Gumbo the Summerville Howler",
+    "image": "characters/gumbo.png",
+    "tags": [
+      "Hound",
+      "Howler",
+      "Hounddog"
+    ],
+    "description": "Gumbo’s howl echoes through the neighborhood like a warning siren. Whether he’s solving mysteries or stirring them up. Gumbo's legendary howl can be heard across the whole neighborhood and usually signals that something very interesting is about to happen."
+  },
+  {
+    "name": "Capn Oh Yeah the Wall-Bustin Corgi",
+    "image": "characters/capn-oh-yeah.png",
+    "tags": [
+      "Corgi",
+      "Chaos",
+      "Wall Buster"
+    ],
+    "description": "Cap’n Oh Yeah doesn’t enter scenes, he explodes into them. Walls, fences, logic...none of it slows him down. Pure energy, pure chaos, and somehow always smiling through it. No wall is safe. No boundary is respected. Cap'n Oh Yeah bursts onto the scene with unstoppable enthusiasm and a total disregard for structural integrity. The neighborhood's most enthusiastic demolition expert."
+  },
+  {
+    "name": "Nimble Nut",
+    "image": "characters/nimble-nut.png",
+    "tags": [
+      "Squirrel Mafia",
+      "Nimble Nut",
+      "Antagonist"
+    ],
+    "description": "The slick, calculating leader of the Squirrel Mafia, Nimble Nut runs backyard operations with precision and is locked in an ongoing turf war with Honey Bear over the bird feeder."
+  },
+  {
+    "name": "Cardinal",
+    "image": "characters/cardinal.png",
+    "tags": [
+      "Cardinal",
+      "Bird",
+      "Red"
+    ],
+    "description": "Always busy, always chirping, the robin adds energy to the yard and somehow ends up in the middle of more situations than it planned for. A bright red regular at the feeder, the cardinal brings just enough attitude to hold its own in the backyard drama. Known for its cheerful songs and striking appearance, the cardinal is a symbol of hope and beauty."
+  },
+  {
+    "name": "Robin",
+    "image": "characters/robin.png",
+    "tags": [
+      "Bird",
+      "Robin",
+      "Brown"
+    ],
+    "description": "A cheerful brown robin that brings joy and energy to the Summerville neighborhood. Known for its melodic songs and vibrant appearance, Robin is a symbol of hope and renewal."
+  },
+  {
+    "name": "Bluejay",
+    "image": "characters/bluejay.png",
+    "tags": [
+      "Bird",
+      "Bluejay",
+      "Blue",
+      "Loud"
+    ],
+    "description": "Bold, noisy, and never subtle, the bluejay makes sure everyone knows when it’s around. Not afraid of confrontation, especially when snacks are involved. A striking blue jay that adds a splash of color and known for its bold personality and vibrant plumage, the blue jay is a symbol of confidence and curiosity."
+  },
+  {
+    "name": "Lizzy the Disappearing Gecko",
+    "image": "characters/lizzy.png",
+    "tags": [
+      "Gecko",
+      "Sneaky",
+      "Mysterious"
+    ],
+    "description": "Blink and she’s gone. Lizzy has perfected the art of disappearing at the exact moment things get interesting…or dangerous. Probably not a coincidence. Now you see her, now you don't. Lizzy has mastered the art of vanishing at exactly the right moment usually just before something goes terribly wrong. Whether this is wisdom or cowardice is still debated."
+  },
+  {
+    "name": "Spidey the Rubber Spider Toy",
+    "image": "characters/spidey.png",
+    "tags": [
+      "Toy",
+      "Rubber Spider",
+      "Troublemaker"
+    ],
+    "description": "A simple rubber spider that causes wildly disproportionate reactions. From midnight panic to full-on household meltdowns, Spidey is small, but mighty. Don't let the rubber exterior fool you. Spidey has caused more midnight screams, dramatic leaps, and household chaos than any real spider ever could. A beloved menace!"
+  },
+  {
+    "name": "Maggie Jean the Gator Turtle",
+    "image": "characters/maggie-jean.png",
+    "tags": [
+      "Turtle",
+      "Gator",
+      "Legendary"
+    ],
+    "description": "Slow, steady, and impossible to ignore, Maggie Jean somehow always ends up exactly where she wants to be usually when it matters most. Part turtle, part legend, she moves at her own pace which is slow, deliberate, and somehow always exactly where you least expect her. Don't be fooled by the shell."
+  },
+  {
+    "name": "Mom",
+    "image": "characters/mom.png",
+    "tags": [
+      "Mom",
+      "Human",
+      "The Boss"
+    ],
+    "description": "The true boss of the house, Mom keeps everything running with a firm hand and a knowing look. She’s seen it all, and nothing surprises her anymore, but she still expects better. The patient, loving, and occasionally exasperated matriarch of the household. Mom keeps the whole operation running meals, schedules, sourdough bread all while somehow managing to remain the voice of reason in a house full of chaos."
+  },
+  {
+    "name": "Dad",
+    "image": "characters/dad.png",
+    "tags": [
+      "Dad",
+      "Human",
+      "Creative",
+      "Tech Enthusiast"
+    ],
+    "description": "A creative thinker with a habit of turning simple ideas into complicated experiments. Dad brings gadgets, schemes, and unexpected solutions into the mix…with mixed results. As the creative force behind it all, Dad brings home gadgets, ideas, and AI-powered pet collars with the enthusiasm of someone who has never once considered the consequences. A Navy veteran, artist, and proud pet dad, Dad is living his best Summerville life."
+  },
+  {
+    "name": "Big Sister",
+    "image": "characters/big-sister.png",
+    "tags": [
+      "Sister",
+      "Human",
+      "Family"
+    ],
+    "description": "Visiting from out of town, Big Sister is often out of the loop on things. A little suspicious of what the pets have been up to while she was away."
+  },
+  {
+    "name": "Big Brother",
+    "image": "characters/big-brother.png",
+    "tags": [
+      "Brother",
+      "Human",
+      "Family"
+    ],
+    "description": "The kind of big brother who shows up exactly when things are at their most chaotic. His reactions say what everyone else is thinking, usually with perfect timing. His reactions to the Sisters' latest adventures are always priceless."
+  },
+  {
+    "name": "Belle the Sassy Southern Goose",
+    "image": "characters/belle-goose.png",
+    "tags": [
+      "Goose",
+      "Sassy",
+      "Southern Belle"
+    ],
+    "description": "Belle runs the yard with confidence and attitude. She doesn’t chase chaos, she controls it. And everyone else knows it."
+  },
+  {
+    "name": "Beau the Southern Gentleman Goose",
+    "image": "characters/beau-goose.png",
+    "tags": [
+      "Goose",
+      "Trapped",
+      "Gentleman"
+    ],
+    "description": "Polite, composed, and always respectful, Beau balances Belle’s fire with calm Southern charm but he’s no pushover. With all Southern charm and good manners, Beau is Belle's devoted companion and the model of genteel behavior. But don't mistake his courtesy for weakness."
+  },
+  {
+    "name": "Radar the Backyard Guardian Pointer",
+    "image": "characters/radar.png",
+    "tags": [
+      "Pointer",
+      "Dog",
+      "Guardian"
+    ],
+    "description": "Radar sees everything. Whether it’s a squirrel, a delivery truck, or a leaf blowing the wrong way, he’s already locked in and pointing. Always on duty. Nothing moves in the backyard without being detected, catalogued, and pointed at with laser precision. Squirrels, delivery drivers, leaves: they are all equally suspicious!"
+  },
+  {
+    "name": "Meemaw Grace the Kind-Hearted Caretaker",
+    "image": "characters/meemaw-grace.png",
+    "tags": [
+      "Meemaw",
+      "Human",
+      "Sweet Soul",
+      "Grace"
+    ],
+    "description": "Kind, wise, and full of Southern charm, Meemaw Grace brings calm to the chaos. She believes there’s good in everyone. Meemaw Grace has a kind word for everyone, including Bootsie Belle, who she insists is just misunderstood. Meemaw is probably right."
+  },
+  {
+    "name": "Ace the Forgetful Golfer",
+    "image": "characters/ace.png",
+    "tags": [
+      "Ace",
+      "Human",
+      "Comic Relief"
+    ],
+    "description": "Ace plays golf with confidence…accuracy optional. His vision may be questionable, but his belief in his own performance never is. Ace lives for the fairway, when he can remember where it is. His golf game is as unpredictable as his vision and memory, and somehow both manage to cause maximum disruption to everyone around him."
+  },
+  {
+    "name": "Tiffany the White Persian Cat",
+    "image": "characters/tiffany.png",
+    "tags": [
+      "Tiffany",
+      "Persian Cat",
+      "High Maintenance"
+    ],
+    "description": "Immaculate. Elegant. Deeply offended by everything. Tiffany the White Persian Cat operates at a level of sophistication that the rest of the household can only aspire to — and she will never let them forget it. Tiffany expects luxury, respect, and admiration, and assumes she’ll get all three."
+  },
+  {
+    "name": "Eileen the Postal Worker",
+    "image": "characters/eileen.png",
+    "tags": [
+      "USPS",
+      "Eileen",
+      "Human",
+      "Brave Soul"
+    ],
+    "description": "The most courageous person on the route, Eileen faces Honey Bear's security protocols and Bootsie Belle's suspicious stares every single day with professional calm and quiet heroism. She delivers the mail through chaos, barking security systems, and suspicious stares without missing a beat. Calm, steady, and tougher than she looks. A true public servant."
+  },
+  {
+    "name": "Spike the Bunny",
+    "image": "characters/spike-the-bunny.jpeg",
+    "tags": [
+      "Spike",
+      "Bunny",
+      "Rabbit"
+    ],
+    "description": "Spike is a cute little bunny but also has quirky attitude. This bunny boy is edgy and mysterious at times."
+  },
+  {
+    "name": "Buggies the Mosquito",
+    "image": "characters/buggies-the-mosquito.png",
+    "tags": [
+      "Mosquito",
+      "Buggies",
+      "Summertime",
+      "Flying Frenzy",
+      "Blood Sucker"
+    ],
+    "description": "Small but mighty. Big personality. Always buzzing around somewhere!\nSPECIES: Aedes Sillyus\nPERSONALITY: Curious, upbeat, and a little bitey.\nLOVES: Adventure, shiny things, sweet nectar\nDISLIKES: Bug spray, swatting, rainy days"
+  },
+  {
+    "name": "Dr. Vacuum",
+    "image": "characters/dr-vacuum.png",
+    "tags": [
+      "Dr Vacuum",
+      "Hairball Horde",
+      "Villain",
+      "Sinister"
+    ],
+    "description": "A sinister villain, Dr. Vacuum and his Hairball Horde suck up all the treats and toys."
+  },
+  {
+    "name": "Mom Pixie Curl",
+    "image": "characters/mom-pixie-curl.png",
+    "tags": [
+      "Mom",
+      "Pixie Curl",
+      "Haircut"
+    ],
+    "description": "Mom get a new hairdo with Pixie Curls and there are mixed feelings about it!  But even Bootsie Belle warms up to the new style and her Mom over time!"
+  },
+  {
+    "name": "General Frog",
+    "image": "characters/general-frog.png",
+    "tags": [
+      "Garage",
+      "Tree Frog",
+      "General Frog",
+      "Godzilla"
+    ],
+    "description": "An American Green Tree Frog (Hyla cinerea), this General leads from the pond! Disciplined, brave, strategic, and fair, he leads with honor and expects the best from others.\nLIKES:\n• Dewy mornings\n• Order and duty\n• Protecting the pond\n• A job well done\nDISLIKES:\n• Careless campers\n• Pollution\n• Loud leaf blowers\n• Unnecessary chaos\n\nGeneral Frog is the respected leader of the Backyard Battalion, keeping Summerville safe from everyday threats big and small. Wise in counsel and swift in action, he believes in teamwork, preparation, and doing what's right — no matter your size.\n\n“Because a calm pond makes for a strong Summerville!”"
+  },
+  {
+    "name": "Caddy Hack (the gofer)",
+    "image": "characters/caddy-hack-the-gofer.png",
+    "tags": [
+      "Gofer",
+      "Caddy Shack",
+      "Golf Course",
+      "Ornery"
+    ],
+    "description": "Caddy Hack is a gofer who is very mischievous, loud, unapologetic, loves golf courses, and causing trouble."
+  }
+]
