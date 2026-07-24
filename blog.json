@@ -1,11 +1,32 @@
 [
   {
+    "slug": "adopted-or-responsibly-bred-every-pet-deserves-love",
+    "date": "2026-07-24",
+    "title": "🐾 Adopted or Responsibly Bred: Every Pet Deserves Love! 🐾",
+    "tags": [
+      "Adopt",
+      "Shop",
+      "Pet",
+      "Rescue",
+      "Breeder",
+      "Coexist"
+    ],
+    "body": "When we first moved to South Carolina and began looking for a kitten and a puppy, I noticed how strongly many rescue organizations promoted the phrase, “Adopt, don’t shop.”\n\nI understand the purpose behind that message, but I believe responsible adoption and responsible breeding can both have a place. There are unethical breeders, but rescues can also vary greatly in their practices. No matter which path a family chooses, the most important step is doing careful research and making a thoughtful, lifelong commitment.\n\nWe adopted Bootsie Belle from Dorchester Paws when she was a tiny, one-pound tuxedo kitten. For Honey Bear, we chose a registered breeder in Indiana because we specifically wanted a Yorkie with a documented background and greater predictability in size, temperament traits, and health history.\n\nTheir beginnings were completely different, but the love they bring into our home is exactly the same.\n\nDifferent stories. Same heart. Endless love. We can coexist.",
+    "image": "images/blog/adopted-or-responsibly-bred-every-pet-deserves-love.jpeg"
+  },
+  {
     "slug": "introducing-comicsgen",
     "date": "2026-05-03",
     "title": "Introducing ComicsGen — AI-Powered Comic Creation for Everyone",
     "image": "images/blog/comicsgen-intro.jpeg",
     "youtube": "kF31oGKbnnQ",
-    "tags": ["ComicsGen", "AI", "Comic Creation", "FLUX.1", "Llama"],
+    "tags": [
+      "ComicsGen",
+      "AI",
+      "Comic Creation",
+      "FLUX.1",
+      "Llama"
+    ],
     "body": "ComicsGen is an AI-powered comic creation app I recently started developing to help anyone bring their characters and stories to life through comic strips using AI.\n\nIt all began over 6 months ago with my daily comic strip, Sisters of Summerville, starring my Yorkie Honey Bear and tuxedo cat Bootsie Belle. That creative journey sparked a bigger idea… what if anyone could create their own comic strip with no art skills or expensive software required?\n\nComicsGen is being built as an easy-to-use AI comic studio where users can design characters, write stories, create storyboards, choose styles and layouts, add dialogue, and export finished comics ready to share.\n\nPowered by advanced AI tools including FLUX.1 image generation and Llama 3.3 storytelling."
   },
   {
@@ -18,7 +39,14 @@
       "images/blog/metabot-enforcer-02.png",
       "images/blog/metabot-enforcer-03.png"
     ],
-    "tags": ["Metabot", "Facebook", "Meta", "Community Standards", "New Character", "Satire"],
+    "tags": [
+      "Metabot",
+      "Facebook",
+      "Meta",
+      "Community Standards",
+      "New Character",
+      "Satire"
+    ],
     "body": "The newest character invading the Sisters of Summerville comic strip has arrived — and it's not friendly.\n\nBefore my Facebook account deletion on May 18, I'm planning a few episodes exposing the \"truth\" that Meta and Facebook are no longer run by humans… as the METABOTS have taken over!\n\nThe Enforcer patrols the platform enforcing \"Community Standards,\" deleting accounts, blocking appeals, and making sure nobody can ever speak to a human again. Resistance is futile!\n\nMeet METABOT: ENFORCER — Character ID SOS-METABOT-ENF-001. Built by the Supreme Ruler to police the platform and crush dissent. Metabots do not think. They enforce.\n\nThere are no humans left at Meta. Only Metabots. Appealing is futile. You will never speak to a human.\n\nWeapon systems include the Community Standards Beam (no context, no mercy), Violation Scanner (finds offenses instantly — everything is suspicious), Appeal Shutdown (blocks all appeals, no review), Shadow Ban Pulse (makes users invisible, silences without notice), and the Permanent Ban Protocol (erases identity, no return, no second chances).\n\nVulnerabilities — all eliminated: Human Empathy, Critical Thinking, Moral Judgment, Free Will, Conscience.\n\nThey don't work for us. They work for him. Unplug. Speak. Fight back.\n\n#SistersOfSummerville #Metabot #FacebookEnforcer #CommunityStandards #Satire #AIComics"
   },
   {
@@ -29,7 +57,12 @@
     "images": [
       "images/blog/facebook-account-deletion-warning.jpg"
     ],
-    "tags": ["Deletion", "Facebook", "Account", "Warning"],
+    "tags": [
+      "Deletion",
+      "Facebook",
+      "Account",
+      "Warning"
+    ],
     "body": "After months of trying to appeal mysterious \"community standards\" violations, it appears my Facebook account may be permanently deleted on May 18th. I still honestly don't know exactly what I supposedly did wrong as they don't provide evidence. The process has been entirely AI automated, and every appeal path seems to lead back to AI chatbots and dead ends.\n\nSo while I'm trying to keep a sense of humor about it (yes… the \"Meta Bot Council\" memes are real 😂🤖), this situation is unfortunately very real. If my account suddenly disappears, PLEASE stay connected with me and the Sisters of Summerville crew here:\n\n👉 MAIN SITE: https://sisters-of-summerville.github.io\n\n👉 Email Comic Signup: https://sisters-of-summerville.github.io/#subscribe\n\n👉 Instagram: https://www.instagram.com/dfliesen\n\n👉 X / Twitter: https://x.com/dfliesen\n\n👉 LinkedIn: https://www.linkedin.com/in/fliesen\n\n👉 Nextdoor: https://nextdoor.com/profile/01Jz42mgqrxPb8wMM\n\nNo matter what happens with Facebook, the comics will continue. Thank you all for the laughs, support, encouragement, and Southern sass along the way. And remember… WATCH OUT FOR THEM AI BOTS. 🤖🔥 ❤️🐾"
   }
 ]
