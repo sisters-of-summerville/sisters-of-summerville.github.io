@@ -310,5 +310,16 @@
       "Ornery"
     ],
     "description": "Caddy Hack is a gofer who is very mischievous, loud, unapologetic, loves golf courses, and causing trouble."
+  },
+  {
+    "name": "Bruce the Dragonfly",
+    "image": "characters/bruce-the-dragonfly.png",
+    "tags": [
+      "Dragonfly",
+      "Bruce",
+      "Pest",
+      "Martial Arts"
+    ],
+    "description": "Bruce is a dragonfly that likes to fly around close to the back covered porch where the cat Bootsie Belle is taunted by this winged intruder."
   }
 ]
