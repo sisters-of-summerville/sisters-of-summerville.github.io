@@ -1,1 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#8f281e">
+  <meta name="description" content="Six playable Sisters of Summerville comic adventures in one colorful 2.5D arcade.">
+  <title>Sisters of Summerville Arcade</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="assets/icon-192.png">
+  <link rel="preload" href="assets/living-room.webp" as="image">
+  <link rel="preload" href="assets/backyard.webp" as="image">
+  <link rel="preload" href="assets/acorn-green.webp" as="image">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="arcade-frame" aria-label="Sisters of Summerville Arcade">
+      <header class="top-bar">
+        <div class="brand-lockup" aria-label="Sisters of Summerville Arcade">
+          <span class="brand-name">Sisters <small>of Summerville</small></span>
+          <span class="arcade-name">Chaos Arcade</span>
+        </div>
+        <div class="reward-wallet" aria-label="Arcade rewards">
+          <span class="wallet-item"><b id="totalStars">0</b> ★ <small>Stars</small></span>
+          <span class="wallet-item"><b id="totalTickets">0</b> 🎟️ <small>Treat Tickets</small></span>
+        </div>
+        <a class="comic-link" href="https://sisters-of-summerville.github.io/" aria-label="Back to the Sisters of Summerville comics">← Comics</a>
+        <button id="soundButton" class="round-button" type="button" aria-label="Turn sound off" aria-pressed="true">♪</button>
+      </header>
 
+      <section id="arcadeScreen" class="screen arcade-screen">
+        <div class="arcade-heading">
+          <div>
+            <p class="eyebrow">Choose Your Chaos</p>
+            <h1>Six games. One very busy neighborhood.</h1>
+          </div>
+          <div class="progress-card">
+            <span>Arcade Progress</span>
+            <div class="progress-track"><i id="progressFill"></i></div>
+            <strong id="progressText">0 of 18 stars</strong>
+          </div>
+        </div>
+        <div id="gameGrid" class="game-grid" aria-label="Games"></div>
+      </section>
+
+      <section id="playScreen" class="screen play-screen" hidden>
+        <div class="game-toolbar">
+          <button id="arcadeButton" class="back-button" type="button">‹ Arcade</button>
+          <div class="game-title-wrap">
+            <span id="gameKicker">Game 1</span>
+            <h1 id="gameTitle">Roomba Rodeo</h1>
+          </div>
+          <div id="gameHud" class="game-hud" aria-live="polite">
+            <div class="hud-cell"><span id="hudLabel1">Goal</span><strong id="hudValue1">0</strong></div>
+            <div class="hud-cell"><span id="hudLabel2">Time</span><strong id="hudValue2">0</strong></div>
+            <div class="hud-cell"><span id="hudLabel3">Score</span><strong id="hudValue3">0</strong></div>
+          </div>
+          <button id="pauseButton" class="round-button" type="button" aria-label="Pause game">Ⅱ</button>
+        </div>
+
+        <div id="gameStage" class="game-stage" tabindex="0" aria-label="Game area">
+          <div id="backgroundLayer" class="background-layer"></div>
+          <div id="world" class="world"></div>
+          <div id="coach" class="coach" hidden>
+            <div id="coachBubble" class="speech-bubble"></div>
+            <img id="coachImage" src="assets/bootsie.webp" alt="">
+          </div>
+
+          <div id="instructionOverlay" class="overlay instruction-overlay">
+            <div class="paper-card instruction-card">
+              <img id="instructionImage" class="instruction-character" src="assets/honey-roomba.webp" alt="">
+              <div class="instruction-copy">
+                <p id="instructionKicker" class="eyebrow">Game 1</p>
+                <h2 id="instructionTitle">Roomba Rodeo</h2>
+                <p id="instructionText"></p>
+                <div id="instructionRewards" class="reward-preview"></div>
+                <button id="startGameButton" class="primary-button" type="button">Play</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="roundOverlay" class="overlay compact-overlay" hidden>
+            <div class="paper-card round-card">
+              <p id="roundKicker" class="eyebrow">Round Complete</p>
+              <h2 id="roundTitle">Next Round</h2>
+              <p id="roundText"></p>
+              <button id="continueButton" class="primary-button" type="button">Continue</button>
+            </div>
+          </div>
+
+          <div id="pauseOverlay" class="overlay compact-overlay" hidden>
+            <div class="paper-card round-card">
+              <p class="eyebrow">Hold That Thought</p>
+              <h2>Paused</h2>
+              <button id="resumeButton" class="primary-button" type="button">Keep Playing</button>
+              <button id="restartButton" class="secondary-button" type="button">Restart Game</button>
+            </div>
+          </div>
+
+          <div id="resultOverlay" class="overlay result-overlay" hidden>
+            <div class="paper-card result-card">
+              <p id="resultKicker" class="eyebrow">Game Complete</p>
+              <h2 id="resultTitle">Nicely Done!</h2>
+              <div id="resultStars" class="result-stars" aria-label="Stars earned">☆☆☆</div>
+              <div class="result-numbers">
+                <span><small>Score</small><b id="resultScore">0</b></span>
+                <span><small>Reward</small><b id="resultTickets">+0 🎟️</b></span>
+                <span><small>Best</small><b id="resultBest">0</b></span>
+              </div>
+              <p id="resultLine" class="verdict"></p>
+              <button id="playAgainButton" class="primary-button" type="button">Play Again</button>
+              <button id="resultArcadeButton" class="secondary-button" type="button">Choose Another Game</button>
+            </div>
+          </div>
+
+          <div id="announcement" class="sr-only" aria-live="assertive"></div>
+        </div>
+      </section>
+    </section>
+  </main>
+  <script src="game.js" defer></script>
+</body>
+</html>

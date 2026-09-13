@@ -1,0 +1,14 @@
+{
+  "name": "Sisters of Summerville Chaos Arcade",
+  "short_name": "Chaos Arcade",
+  "description": "Six playable Sisters of Summerville comic adventures.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#6f1e18",
+  "theme_color": "#9d2d22",
+  "orientation": "any",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
