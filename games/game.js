@@ -142,6 +142,7 @@
   }
 
   function launchCurrentGame() {
+    enterGameFullscreen();
     instructionOverlay.hidden = true;
     resultOverlay.hidden = true;
     roundOverlay.hidden = true;
@@ -165,9 +166,33 @@
 
   function showArcade() {
     cleanupGame();
+    exitGameFullscreen();
     playScreen.hidden = true;
     arcadeScreen.hidden = false;
     renderArcade();
+  }
+
+  function enterGameFullscreen() {
+    document.body.classList.add("game-fullscreen");
+    const root = document.documentElement;
+    const request = root.requestFullscreen || root.webkitRequestFullscreen;
+    if (request && !document.fullscreenElement && !document.webkitFullscreenElement) {
+      try {
+        const result = request.call(root, { navigationUI: "hide" });
+        result?.catch?.(() => {});
+      } catch (_) { /* The full-viewport CSS mode still works on iPad and Safari. */ }
+    }
+  }
+
+  function exitGameFullscreen() {
+    document.body.classList.remove("game-fullscreen");
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
+      try {
+        const result = exit.call(document);
+        result?.catch?.(() => {});
+      } catch (_) { /* The regular page layout has already been restored. */ }
+    }
   }
 
   function setHud(label1, value1, label2, value2, label3, value3) {
