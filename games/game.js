@@ -679,5 +679,5 @@
   document.addEventListener("visibilitychange",()=>{if(document.hidden&&currentModule&&!paused)togglePause(true);});
 
   renderArcade();
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").then(registration=>registration.update()).catch(()=>{}));
 })();

@@ -4,8 +4,8 @@
   "description": "Six playable Sisters of Summerville comic adventures.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#6f1e18",
-  "theme_color": "#9d2d22",
+  "background_color": "#0b0b13",
+  "theme_color": "#0b0b13",
   "orientation": "any",
   "icons": [
     { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
