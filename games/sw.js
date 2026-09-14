@@ -1,10 +1,11 @@
-const CACHE = "sisters-chaos-arcade-v5";
+const CACHE = "sisters-chaos-arcade-v6";
 const ASSETS = [
   "./", "index.html", "styles.css", "game.js", "manifest.webmanifest",
   "assets/living-room.webp", "assets/backyard.webp", "assets/acorn-green.webp", "assets/bootsie-search-room.webp",
   "assets/honey-roomba.webp", "assets/bootsie.webp", "assets/nimble-nut.webp",
   "assets/nimble-nut-squashed.webp", "assets/maggie-jean.webp", "assets/caddy-hack.webp",
-  "assets/icon-192.png", "assets/icon-512.png"
+  "assets/icon-192.png", "assets/icon-512.png",
+  "assets/radar.png", "assets/meemaw.png", "assets/beau.png", "assets/belle.png"
 ];
 self.addEventListener("install", event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS))));
 self.addEventListener("activate", event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))));
