@@ -661,36 +661,37 @@
     gooserescue() {
       const runtime=makeRuntime();
       const missions=[
-        {name:"Fairway Roundup",time:48,hazards:1,speed:.78},
-        {name:"Sprinkler Scramble",time:44,hazards:2,speed:.86},
-        {name:"The Great Goose Chase",time:40,hazards:3,speed:.96}
+        {name:"Fairway Roundup",time:52,hazards:1,speed:.72},
+        {name:"Sprinkler Scramble",time:48,hazards:2,speed:.80},
+        {name:"The Great Goose Chase",time:44,hazards:3,speed:.88}
       ];
       let mission=0,running=false,time=0,score=0,radar,beau,belle,meemaw,hazards=[],saved=0,hits=0,last=0,graceUsed=false;
       function sprite(image,cls,x,y,w){const el=create("div",`rescue-sprite ${cls}`);el.innerHTML=`<img src="${image}" alt="">`;el.style.width=w;place(el,x,y,40+Math.round(y));return {el,x,y,vx:0,vy:0,saved:false};}
       function start(){running=true;runtime.every(tick,1000);startMission();}
       function startMission(){
-        world.innerHTML="";const cfg=missions[mission];time=cfg.time;saved=0;graceUsed=false;hazards=[];
-        const safe=create("div","goose-safe-zone");safe.innerHTML='<b>MEEMAW’S SAFE ZONE</b><span>Bring Beau + Belle here</span>';place(safe,86,22,22);
-        meemaw=sprite("assets/meemaw.png","meemaw-rescue",88,27,"clamp(80px,10vw,145px)");
-        radar=movingCharacter(runtime,{image:"assets/radar.png",className:"radar-rescue",x:15,y:78,speed:.42,maxSpeed:1.35,minX:5,maxX:95,minY:16,maxY:91});
-        beau=sprite("assets/beau.png","goose-rescue beau",40,60,"clamp(70px,9vw,125px)");
-        belle=sprite("assets/belle.png","goose-rescue belle",31,42,"clamp(72px,9vw,130px)");
-        const spots=shuffle([{x:52,y:35,t:"🎣",n:"FISHING LINE"},{x:63,y:64,t:"💦",n:"SPRINKLER"},{x:72,y:42,t:"⛳",n:"GOLF BALL"},{x:48,y:76,t:"🛺",n:"CART"}]);
+        world.innerHTML="";coach.hidden=true;const cfg=missions[mission];time=cfg.time;saved=0;graceUsed=false;hazards=[];
+        const missionPanel=create("div","rescue-mission-panel");missionPanel.innerHTML=`<span>MISSION ${mission+1} OF 3</span><b>${cfg.name}</b><small>Get behind Beau & Belle and gently guide them to Meemaw.</small>`;
+        const safe=create("div","goose-safe-zone");safe.innerHTML='<span class="safe-home">HOME</span><b>MEEMAW’S SAFE ZONE</b><span>Bring both geese here</span>';place(safe,86,26,22);
+        meemaw=sprite("assets/meemaw.png","meemaw-rescue",87,27,"clamp(72px,8vw,112px)");
+        radar=movingCharacter(runtime,{image:"assets/radar.png",className:"radar-rescue",x:16,y:78,speed:.42,maxSpeed:1.32,minX:5,maxX:95,minY:18,maxY:91});
+        beau=sprite("assets/beau.png","goose-rescue beau",42,61,"clamp(64px,7vw,100px)");
+        belle=sprite("assets/belle.png","goose-rescue belle",31,43,"clamp(66px,7.2vw,104px)");
+        const spots=shuffle([{x:54,y:36,t:"🎣",n:"FISHING LINE"},{x:62,y:68,t:"💦",n:"SPRINKLER"},{x:72,y:47,t:"⛳",n:"GOLF BALL"},{x:48,y:77,t:"🛺",n:"CART"}]);
         for(let i=0;i<cfg.hazards;i++){const h=spots[i];const el=create("div","goose-hazard");el.innerHTML=`<span>${h.t}</span><b>${h.n}</b>`;place(el,h.x,h.y,35);hazards.push({...h,el,cool:0});}
-        const help=create("button","meemaw-help");help.type="button";help.textContent="♥ Meemaw Help";runtime.on(help,"click",useGrace);
-        const status=create("div","rescue-status");status.id="rescueStatus";status.textContent=`Mission ${mission+1}: Get behind the geese and guide them home!`;
-        addCoach("Radar, bring those two back safe. Easy and gentle!", "assets/meemaw.png", "Meemaw Grace");
+        const help=create("button","meemaw-help");help.type="button";help.innerHTML="♥ <span>Meemaw Help</span>";runtime.on(help,"click",useGrace);
+        const status=create("div","rescue-status");status.id="rescueStatus";status.textContent="Move Radar behind a goose — your position gently pushes it away from you.";
+        const legend=create("div","rescue-legend");legend.innerHTML='<span><i class="dot radar-dot"></i>Radar</span><span><i class="dot beau-dot"></i>Beau</span><span><i class="dot belle-dot"></i>Belle</span>';
         last=performance.now();update();runtime.frame(loop);
       }
-      function useGrace(){if(!running||paused||graceUsed)return;graceUsed=true;score=Math.max(0,score-250);[beau,belle].filter(g=>!g.saved).forEach((g,i)=>{g.x=65+i*5;g.y=35+i*8;g.vx=.2;g.vy=-.1;place(g.el,g.x,g.y)});document.querySelector('.meemaw-help')?.classList.add('used');popText(74,29,"THIS WAY, SWEETHEARTS!");addCoach("Come on now, babies. Radar’s got you.","assets/meemaw.png","Meemaw Grace");}
+      function useGrace(){if(!running||paused||graceUsed)return;graceUsed=true;score=Math.max(0,score-250);[beau,belle].filter(g=>!g.saved).forEach((g,i)=>{g.x=66+i*5;g.y=39+i*8;g.vx=.18;g.vy=-.08;place(g.el,g.x,g.y)});document.querySelector('.meemaw-help')?.classList.add('used');popText(75,31,"MEEMAW CALLS THEM IN!");const s=$("rescueStatus");if(s)s.textContent="Meemaw has called them closer. Get behind them and finish the rescue!";}
       function tick(){if(paused||!running)return;time--;update();if(time<=0)finish(false);}
-      function moveGoose(g,other,dt,temper){if(g.saved)return;const dx=g.x-radar.state.x,dy=g.y-radar.state.y,d=Math.hypot(dx*1.35,dy);if(d<19){const force=(19-d)/19*(.12+temper);g.vx+=(dx/(d||1))*force*dt;g.vy+=(dy/(d||1))*force*dt;}const od=Math.hypot(g.x-other.x,g.y-other.y);if(od<8){g.vx+=(g.x-other.x)/(od||1)*.025*dt;g.vy+=(g.y-other.y)/(od||1)*.025*dt;}g.vx+=(Math.random()-.5)*.012*dt*temper;g.vy+=(Math.random()-.5)*.012*dt*temper;const mag=Math.hypot(g.vx,g.vy),max=missions[mission].speed;if(mag>max){g.vx=g.vx/mag*max;g.vy=g.vy/mag*max;}g.x+=g.vx*dt;g.y+=g.vy*dt;g.vx*=Math.pow(.94,dt);g.vy*=Math.pow(.94,dt);g.x=Math.max(7,Math.min(94,g.x));g.y=Math.max(18,Math.min(89,g.y));place(g.el,g.x,g.y,40+Math.round(g.y));g.el.style.transform=`translate(-50%,-70%) scaleX(${g.vx<-.04?-1:1})`;if(Math.hypot((g.x-86)*1.2,g.y-25)<12)saveGoose(g);}
-      function saveGoose(g){if(g.saved)return;g.saved=true;saved++;score+=900+time*20;g.el.classList.add("rescued");popText(g.x,g.y,g===belle?"BELLE IS SAFE!":"BEAU IS SAFE!");beep(680,.12,"sine",.04);if(saved===2)completeMission();update();}
+      function moveGoose(g,other,dt,temper){if(g.saved)return;const dx=g.x-radar.state.x,dy=g.y-radar.state.y,d=Math.hypot(dx*1.35,dy);if(d<19){const force=(19-d)/19*(.11+temper);g.vx+=(dx/(d||1))*force*dt;g.vy+=(dy/(d||1))*force*dt;}const od=Math.hypot(g.x-other.x,g.y-other.y);if(od<8){g.vx+=(g.x-other.x)/(od||1)*.025*dt;g.vy+=(g.y-other.y)/(od||1)*.025*dt;}g.vx+=(Math.random()-.5)*.009*dt*temper;g.vy+=(Math.random()-.5)*.009*dt*temper;const mag=Math.hypot(g.vx,g.vy),max=missions[mission].speed;if(mag>max){g.vx=g.vx/mag*max;g.vy=g.vy/mag*max;}g.x+=g.vx*dt;g.y+=g.vy*dt;g.vx*=Math.pow(.94,dt);g.vy*=Math.pow(.94,dt);g.x=Math.max(7,Math.min(94,g.x));g.y=Math.max(19,Math.min(89,g.y));place(g.el,g.x,g.y,40+Math.round(g.y));g.el.style.transform=`translate(-50%,-78%) scaleX(${g.vx<-.04?-1:1})`;if(Math.hypot((g.x-86)*1.2,g.y-28)<10.5)saveGoose(g);}
+      function saveGoose(g){if(g.saved)return;g.saved=true;saved++;score+=900+time*20;g.el.classList.add("rescued");popText(g.x,g.y,g===belle?"BELLE SAFE!":"BEAU SAFE!");beep(680,.12,"sine",.04);const s=$("rescueStatus");if(s)s.textContent=saved===1?"One goose safe! Bring the other one home.":"Both geese are safe!";if(saved===2)completeMission();update();}
       function hitGoose(g,h,now){if(g.saved||now<h.cool)return;h.cool=now+1400;hits++;score=Math.max(0,score-150);g.vx+=(g.x-h.x)*.12;g.vy+=(g.y-h.y)*.12;popText(h.x,h.y,h.n+"!");beep(125,.12,"sawtooth",.04);}
-      function loop(now){if(!running)return;const dt=Math.min((now-last)/16.667,2);last=now;if(!paused){radar.update(dt,.42,1.35);moveGoose(beau,belle,dt,.10);moveGoose(belle,beau,dt,.16);hazards.forEach(h=>{[beau,belle].forEach(g=>{if(!g.saved&&Math.hypot((g.x-h.x)*1.3,g.y-h.y)<8)hitGoose(g,h,now);});});}runtime.frame(loop);}
-      function completeMission(){score+=time*35;const done=mission+1;mission++;if(mission>=missions.length){finish(true);return;}running=false;showRound(`Rescue ${done} Complete`,"Both Geese Safe!",`Next: ${missions[mission].name}. Belle has apparently decided cooperation is optional.`,`Start Mission ${mission+1}`,()=>{roundOverlay.hidden=true;running=true;startMission();});}
-      function update(){setHud("Mission",`${Math.min(mission+1,3)}/3`,"Geese Safe",`${saved}/2`,"Time",time);const s=$("rescueStatus");if(s)s.textContent=saved===0?"Circle behind Beau and Belle to herd them toward Meemaw.":saved===1?"One safe — bring the other goose home!":"Both safe!";}
-      function finish(won){if(!running)return;running=false;const stars=won?(hits===0&&!graceUsed?3:hits<=3?2:1):(mission>=1?1:0);completeGame({score,stars,title:won?"RADAR SAVED THE DAY!":"THE GEESE GOT AWAY!",line:won?`“Good boy, Radar. Everybody’s safe.”<br><b>— Meemaw Grace</b><br><small>Belle is already looking toward the next fairway.</small>`:`“We’ll round ’em up again, sweetheart.”<br><b>— Meemaw Grace</b>`});}
+      function loop(now){if(!running)return;const dt=Math.min((now-last)/16.667,2);last=now;if(!paused){radar.update(dt,.42,1.32);moveGoose(beau,belle,dt,.08);moveGoose(belle,beau,dt,.13);hazards.forEach(h=>{[beau,belle].forEach(g=>{if(!g.saved&&Math.hypot((g.x-h.x)*1.3,g.y-h.y)<7)hitGoose(g,h,now);});});}runtime.frame(loop);}
+      function completeMission(){score+=time*35;const done=mission+1;mission++;if(mission>=missions.length){finish(true);return;}running=false;showRound(`Rescue ${done} Complete`,"Both Geese Safe!",`Next: ${missions[mission].name}. Belle is getting less cooperative.`,`Start Mission ${mission+1}`,()=>{roundOverlay.hidden=true;running=true;startMission();});}
+      function update(){setHud("Mission",`${Math.min(mission+1,3)}/3`,"Geese Safe",`${saved}/2`,"Time",time);}
+      function finish(won){if(!running)return;running=false;const stars=won?(hits===0&&!graceUsed?3:hits<=3?2:1):(mission>=1?1:0);completeGame({score,stars,title:won?"RADAR SAVED THE DAY!":"THE GEESE GOT AWAY!",line:won?`“Good boy, Radar. Everybody’s safe.”<br><b>— Meemaw Grace</b><br><small>Belle is already eyeing the next fairway.</small>`:`“We’ll round ’em up again, sweetheart.”<br><b>— Meemaw Grace</b>`});}
       return{start,stop(){running=false;},destroy(){running=false;runtime.clear();}};
     },
 
@@ -762,5 +763,5 @@
   });
 
   renderArcade();
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=7").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=8").catch(()=>{}));
 })();
