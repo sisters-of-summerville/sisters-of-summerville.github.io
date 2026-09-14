@@ -41,24 +41,24 @@
     },
     {
       id: "paworder", title: "Paw & Order", kicker: "Cushion Crimes Unit",
-      description: "Search the visible room for three clues, then identify Summerville's most suspicious suspect.",
+      description: "Search the room like a real detective, inspect suspicious objects, collect evidence, then solve the case from what you found.",
       background: "assets/living-room.webp", character: "assets/bootsie.webp",
-      instructions: "Tap the three glowing evidence markers in the room. Only after you find every clue will the generous 25-second accusation clock begin. Then choose the suspect whose story fits the evidence.",
-      rewards: ["Visible room clues", "25-second accusation clock", "Five full cases"], button: "Open the Case"
+      instructions: "Search the whole room. Tap ordinary-looking objects to inspect them—some are evidence and some are dead ends. Find all three real clues, read your evidence file, then name the only suspect who fits the facts.",
+      rewards: ["Hidden evidence search", "Real deduction step", "Five mystery cases"], button: "Open the Case"
     },
     {
       id: "watch", title: "Where's Bootsie?", kicker: "Operation Watch Bootsie",
-      description: "Search a cluttered room, move things aside and uncover Summerville's least cooperative cat.",
+      description: "Move actual room clutter out of the way and see whether Summerville's least cooperative cat is hiding behind it.",
       background: "assets/bootsie-search-room.webp", character: "assets/bootsie.webp",
-      instructions: "Search five increasingly crowded rooms. Tap objects to move them aside. Bootsie is hiding behind one of them—when she appears, tap her before time runs out. A hint is available, but it costs points.",
+      instructions: "Search five increasingly cluttered rooms. Tap pillows, baskets, boxes and other objects to physically move them out of the way. No mystery cards—if Bootsie is behind something, you will actually uncover her.",
       rewards: ["Five search rooms", "Movable hiding places", "Speed + no-hint bonuses"], button: "Start Searching"
     },
     {
-      id: "snailmail", title: "Snail Mail Express", kicker: "Special Delivery",
-      description: "Guide Maggie Jean along the walkway, collect the mail and reach the mailbox without getting soaked.",
+      id: "snailmail", title: "Snail Mail: TURBO!", kicker: "Maggie Jean Goes Supersonic",
+      description: "Turn the world's slowest delivery route into a ridiculous turbo dash with boost stamps, mail combos and sprinkler dodges.",
       background: "assets/backyard.webp", character: "assets/maggie-jean.webp",
-      instructions: "Deliver three routes. Drag to guide Maggie Jean along each stone path, collect every letter or parcel, dodge moving sprinklers and squirrels, then reach the mailbox. Routes get narrower and faster.",
-      rewards: ["Three escalating routes", "Moving blockers", "Dry-shell + time bonuses"], button: "Deliver the Mail"
+      instructions: "Drag to steer Maggie Jean. Grab every letter, chain deliveries for bigger points, hit yellow TURBO stamps for a burst of ridiculous speed, dodge sprinklers and squirrels, then slam into the mailbox before time expires.",
+      rewards: ["Turbo speed bursts", "Mail-chain multipliers", "Three escalating delivery sprints"], button: "ENGAGE TURBO"
     }
   ];
 
@@ -136,6 +136,7 @@
     resultOverlay.hidden = true;
     roundOverlay.hidden = true;
     pauseOverlay.hidden = true;
+    $("pauseButton").textContent = "Ⅱ";
     coach.hidden = true;
     world.innerHTML = "";
     setHud("Ready", "—", "Best", progress.games[id]?.best || 0, "Stars", `${progress.games[id]?.stars || 0}/3`);
@@ -148,6 +149,7 @@
     pauseOverlay.hidden = true;
     backgroundLayer.style.filter = "none";
     paused = false;
+    $("pauseButton").textContent = "Ⅱ";
     currentModule = modules[currentId]();
     currentModule.start();
     stage.focus({ preventScroll: true });
@@ -157,6 +159,8 @@
     if (currentModule?.destroy) currentModule.destroy();
     currentModule = null;
     paused = false;
+    pauseOverlay.hidden = true;
+    $("pauseButton").textContent = "Ⅱ";
     roundAction = null;
     world.innerHTML = "";
     coach.hidden = true;
@@ -552,37 +556,42 @@
     paworder() {
       const runtime=makeRuntime();
       const cases=shuffle([
-        {title:"The Crushed Cushion",answer:"Bootsie Belle",choices:["Honey Bear","Bootsie Belle","Nimble Nut"],clues:[{icon:"🖤",x:24,y:38,text:"Black fur"},{icon:"〰️",x:46,y:64,text:"White whisker"},{icon:"🛋️",x:67,y:45,text:"Cat-shaped dent"}]},
-        {title:"The Open Treat Jar",answer:"Honey Bear",choices:["Honey Bear","Caddy Hack","Maggie Jean"],clues:[{icon:"🍪",x:28,y:69,text:"Treat crumbs"},{icon:"🎀",x:51,y:55,text:"Pink bow"},{icon:"🐾",x:72,y:72,text:"Tiny dog prints"}]},
-        {title:"The Acorn Golf Ball",answer:"Caddy Hack",choices:["Bootsie Belle","Caddy Hack","Nimble Nut"],clues:[{icon:"⛳",x:29,y:38,text:"Chewed scorecard"},{icon:"🌰",x:50,y:72,text:"Muddy acorn"},{icon:"🕳️",x:71,y:55,text:"Tunnel dirt"}]},
-        {title:"The Birdseed Heist",answer:"Nimble Nut",choices:["Nimble Nut","Honey Bear","Maggie Jean"],clues:[{icon:"🌻",x:25,y:58,text:"Birdseed trail"},{icon:"🌰",x:48,y:37,text:"Empty acorn cap"},{icon:"🐾",x:70,y:68,text:"Squirrel prints"}]},
-        {title:"The Slow Delivery",answer:"Maggie Jean",choices:["Caddy Hack","Bootsie Belle","Maggie Jean"],clues:[{icon:"📦",x:24,y:68,text:"Damp parcel"},{icon:"💧",x:51,y:45,text:"Slime trail"},{icon:"🐚",x:70,y:60,text:"Shell impression"}]},
-        {title:"The Unraveled Yarn",answer:"Bootsie Belle",choices:["Honey Bear","Bootsie Belle","Caddy Hack"],clues:[{icon:"🧶",x:27,y:72,text:"Loose yarn"},{icon:"🖤",x:49,y:44,text:"Black fur"},{icon:"📚",x:72,y:29,text:"High-shelf clue"}]}
+        {title:"The Crushed Cushion",answer:"Bootsie Belle",choices:["Honey Bear","Bootsie Belle","Nimble Nut"],clues:["Black fur caught in the seam","One long white whisker","A neat cat-sized sleeping dent"],props:[
+          {icon:"🛋️",x:22,y:61,clue:2,label:"sofa cushion"},{icon:"🧶",x:34,y:72,label:"yarn ball"},{icon:"🪴",x:46,y:40,label:"plant"},{icon:"🖤",x:57,y:67,clue:0,label:"dark fuzz"},{icon:"📚",x:69,y:35,label:"books"},{icon:"〰️",x:79,y:57,clue:1,label:"something pale"},{icon:"🧸",x:86,y:76,label:"toy"}]},
+        {title:"The Open Treat Jar",answer:"Honey Bear",choices:["Honey Bear","Caddy Hack","Maggie Jean"],clues:["Tiny treat crumbs under the table","A strand from a pink bow","Small dog paw prints by the jar"],props:[
+          {icon:"🍪",x:24,y:70,clue:0,label:"crumbs"},{icon:"🥣",x:38,y:55,label:"bowl"},{icon:"🎀",x:51,y:34,clue:1,label:"ribbon"},{icon:"🪑",x:64,y:69,label:"chair"},{icon:"🐾",x:75,y:51,clue:2,label:"tracks"},{icon:"🧦",x:84,y:75,label:"sock"},{icon:"📦",x:31,y:35,label:"box"}]},
+        {title:"The Acorn Golf Ball",answer:"Caddy Hack",choices:["Bootsie Belle","Caddy Hack","Nimble Nut"],clues:["A chewed golf scorecard","Mud from the practice green","A caddie-sized acorn tee"],props:[
+          {icon:"⛳",x:21,y:40,clue:0,label:"scorecard"},{icon:"🌰",x:35,y:72,clue:2,label:"acorn"},{icon:"👟",x:48,y:60,label:"shoe"},{icon:"🟫",x:59,y:43,clue:1,label:"mud"},{icon:"🧢",x:72,y:67,label:"cap"},{icon:"📚",x:82,y:34,label:"books"},{icon:"🧶",x:88,y:74,label:"yarn"}]},
+        {title:"The Birdseed Heist",answer:"Nimble Nut",choices:["Nimble Nut","Honey Bear","Maggie Jean"],clues:["Sunflower seeds leading toward the window","An empty acorn cap","Tiny squirrel claw marks on the sill"],props:[
+          {icon:"🌻",x:20,y:63,clue:0,label:"seeds"},{icon:"🌰",x:33,y:37,clue:1,label:"acorn cap"},{icon:"🪟",x:48,y:30,clue:2,label:"window sill"},{icon:"🧸",x:61,y:72,label:"toy"},{icon:"📦",x:73,y:55,label:"box"},{icon:"🧺",x:84,y:70,label:"basket"},{icon:"🧶",x:89,y:39,label:"yarn"}]},
+        {title:"The Slow Delivery",answer:"Maggie Jean",choices:["Caddy Hack","Bootsie Belle","Maggie Jean"],clues:["A damp corner on the parcel","A shiny trail across the floor","A shell-shaped impression in the wrapping"],props:[
+          {icon:"📦",x:22,y:68,clue:0,label:"parcel"},{icon:"💧",x:37,y:47,clue:1,label:"shiny trail"},{icon:"🐚",x:52,y:73,clue:2,label:"shell mark"},{icon:"🪴",x:65,y:40,label:"plant"},{icon:"📚",x:77,y:67,label:"books"},{icon:"🧦",x:86,y:44,label:"sock"},{icon:"🧸",x:32,y:31,label:"toy"}]},
+        {title:"The Unraveled Yarn",answer:"Bootsie Belle",choices:["Honey Bear","Bootsie Belle","Caddy Hack"],clues:["Loose yarn snagged high on the shelf","Black fur tangled in the fibers","A single white whisker beside the spool"],props:[
+          {icon:"🧶",x:22,y:72,clue:0,label:"yarn"},{icon:"🖤",x:38,y:51,clue:1,label:"dark fur"},{icon:"〰️",x:53,y:65,clue:2,label:"pale strand"},{icon:"📚",x:67,y:32,label:"shelf"},{icon:"🪑",x:78,y:70,label:"chair"},{icon:"🧸",x:87,y:48,label:"toy"},{icon:"📦",x:33,y:33,label:"box"}]}
       ]).slice(0,5);
-      let index=0,correct=0,score=0,time=25,streak=0,running=false,timer=null,answered=false,clockActive=false,found=0;
-      function start(){world.innerHTML="";running=true;showCase();timer=runtime.every(()=>{if(paused||!running||answered||!clockActive)return;time--;update();const fill=$("caseTimerFill");if(fill)fill.style.transform=`scaleX(${time/25})`;if(time<=5)document.querySelector(".case-clock")?.classList.add("urgent");if(time<=0){answered=true;clockActive=false;streak=0;popText(72,22,"TIME! CASE COLD!");runtime.later(next,850);}},1000);}
+      let index=0,correct=0,score=0,time=30,streak=0,running=false,answered=false,clockActive=false,found=0,inspected=0;
+      function start(){world.innerHTML="";running=true;showCase();runtime.every(()=>{if(paused||!running||answered||!clockActive)return;time--;update();const fill=$("caseTimerFill");if(fill)fill.style.transform=`scaleX(${time/30})`;if(time<=6)document.querySelector(".case-clock")?.classList.add("urgent");if(time<=0){answered=true;clockActive=false;streak=0;popText(50,20,"CASE WENT COLD!");runtime.later(next,900);}},1000);}
       function showCase(){
-        world.innerHTML="";answered=false;clockActive=false;found=0;time=25;const item=cases[index];
-        const guide=create("div","case-guide");guide.innerHTML=`<b>1. Find all 3 clues</b><span>2. Then accuse a suspect</span>`;
-        const board=create("div","case-board");board.innerHTML=`<div class="case-copy"><p class="eyebrow">Case ${index+1} of 5</p><h2>${item.title}</h2><p class="clue" id="clueList"><b>Evidence locker:</b> Find the three glowing clues in the room.</p><div class="case-clock"><span>Accusation time: <b id="caseClockText">Starts after clues</b></span><i><em id="caseTimerFill"></em></i></div><div class="suspects"></div></div>`;
-        const suspects=board.querySelector(".suspects");
-        shuffle(item.choices).forEach((name)=>{const btn=document.createElement("button");btn.type="button";btn.className="suspect-button";btn.textContent=name;btn.disabled=true;suspects.appendChild(btn);runtime.on(btn,"click",()=>answer(name,btn,board));});
-        item.clues.forEach((clue,n)=>{const btn=create("button","evidence-marker");btn.type="button";btn.innerHTML=`<span>${clue.icon}</span><small>Clue ${n+1}</small>`;btn.setAttribute("aria-label",`Inspect clue ${n+1}`);place(btn,clue.x,clue.y,62);runtime.on(btn,"click",()=>revealClue(btn,clue,board));});
+        world.innerHTML="";answered=false;clockActive=false;found=0;inspected=0;time=30;const item=cases[index];
+        const guide=create("div","case-guide mystery-guide");guide.innerHTML=`<b>CASE ${index+1}/5 · ${item.title}</b><span>Search ordinary objects. Three hide real evidence.</span>`;
+        const dossier=create("div","case-dossier");dossier.innerHTML=`<div class="case-dossier-head"><div><small>EVIDENCE FILE</small><strong>${item.title}</strong></div><span id="inspectCount">0 inspected</span></div><div class="evidence-slots" id="evidenceSlots"><span>Clue 1: ?</span><span>Clue 2: ?</span><span>Clue 3: ?</span></div><div class="deduction-row"><div class="case-clock"><span id="caseClockText">Search first · accusation clock is stopped</span><i><em id="caseTimerFill"></em></i></div><div class="suspects" id="suspects"></div></div>`;
+        const suspects=dossier.querySelector("#suspects");
+        shuffle(item.choices).forEach((name)=>{const btn=document.createElement("button");btn.type="button";btn.className="suspect-button";btn.textContent=name;btn.disabled=true;suspects.appendChild(btn);runtime.on(btn,"click",()=>answer(name,btn,dossier));});
+        item.props.forEach((prop)=>{const btn=create("button","scene-prop");btn.type="button";btn.innerHTML=`<span>${prop.icon}</span>`;btn.setAttribute("aria-label",`Inspect ${prop.label}`);const sceneY=10+prop.y*.62;place(btn,prop.x,sceneY,44+Math.round(sceneY/8));runtime.on(btn,"click",()=>inspect(btn,prop,dossier));});
         update();
       }
-      function revealClue(button,clue,board){
-        if(button.classList.contains("found")||paused||answered)return;button.classList.add("found");button.querySelector("small").textContent=clue.text;found++;score+=100;beep(520+found*70,.07,"sine",.035);
-        const list=board.querySelector("#clueList");list.innerHTML=`<b>Evidence ${found}/3:</b> ${cases[index].clues.filter((_,i)=>world.querySelectorAll(".evidence-marker")[i]?.classList.contains("found")).map(c=>c.text).join(" · ")}`;
-        if(found===3){clockActive=true;board.querySelectorAll(".suspect-button").forEach(btn=>btn.disabled=false);board.classList.add("ready");document.querySelector(".case-guide").innerHTML="<b>All clues found!</b><span>Choose the suspect · 25 seconds</span>";popText(50,18,"CLOCK STARTED!");update();}
+      function inspect(button,prop,dossier){
+        if(paused||answered||button.classList.contains("checked"))return;button.classList.add("checked");inspected++;button.setAttribute("aria-label",`${prop.label} inspected`);const count=$("inspectCount");if(count)count.textContent=`${inspected} inspected`;
+        if(Number.isInteger(prop.clue)){found++;score+=140;button.classList.add("evidence");button.innerHTML=`<span>${prop.icon}</span><b>CLUE</b>`;const slots=[...dossier.querySelectorAll("#evidenceSlots span")];slots[prop.clue].textContent=`Clue ${prop.clue+1}: ${cases[index].clues[prop.clue]}`;popText(prop.x,parseFloat(button.style.top)-7,"EVIDENCE!");beep(560+found*70,.08,"sine",.04);}else{button.classList.add("dead-end");popText(prop.x,parseFloat(button.style.top)-6,"Nothing useful");beep(190,.035,"square",.016);}
+        if(found===3){clockActive=true;dossier.classList.add("ready");dossier.querySelectorAll(".suspect-button").forEach(btn=>btn.disabled=false);const t=$("caseClockText");if(t)t.textContent="All evidence secured · 30 seconds to accuse";document.querySelector(".mystery-guide").innerHTML=`<b>DEDUCTION TIME</b><span>Read the three clues and name the only suspect who fits.</span>`;popText(50,18,"SOLVE THE CASE!");}update();
       }
-      function answer(name,button,board){
-        if(answered||paused||!clockActive)return;answered=true;clockActive=false;const item=cases[index];const buttons=[...board.querySelectorAll("button")];buttons.forEach((btn)=>btn.disabled=true);
-        const right=name===item.answer;if(right){correct++;streak++;const gain=500+time*30+streak*75;score+=gain;button.classList.add("correct");popText(70,24,streak>=2?`${streak}× CASE STREAK!`:"SOLVED!");beep(650,.09,"sine",.04);}else{streak=0;button.classList.add("wrong");buttons.find((btn)=>btn.textContent===item.answer)?.classList.add("correct");popText(70,24,"OBJECTION!");beep(115,.13,"sawtooth",.04);}
-        runtime.later(next,1000);
+      function answer(name,button,dossier){
+        if(answered||paused||!clockActive)return;answered=true;clockActive=false;const item=cases[index];dossier.querySelectorAll("button").forEach(btn=>btn.disabled=true);const right=name===item.answer;
+        if(right){correct++;streak++;score+=650+time*28+streak*90;button.classList.add("correct");popText(50,20,streak>=2?`${streak}× DETECTIVE STREAK!`:"CASE CLOSED!");beep(680,.1,"sine",.045);}else{streak=0;button.classList.add("wrong");[...dossier.querySelectorAll(".suspect-button")].find(btn=>btn.textContent===item.answer)?.classList.add("correct");popText(50,20,"WRONG SUSPECT!");beep(120,.14,"sawtooth",.04);}runtime.later(next,1100);
       }
       function next(){index++;if(index>=cases.length)finish();else showCase();}
-      function update(){setHud("Case",`${index+1}/5`,"Clues",`${found}/3`,clockActive?"Time":"Solved",clockActive?time:correct);const clock=$("caseClockText");if(clock)clock.textContent=clockActive?`${time} seconds`:found===3?"Choose now":"Starts after clues";}
-      function finish(){running=false;score+=correct*200;const stars=correct===5?3:correct>=4?2:correct>=3?1:0;completeGame({score,stars,title:correct===5?"Perfect Detective Work!":"Court Is Adjourned!",line:correct===5?"“You may join my legal team. Bring your own snacks.”<br><b>— Bootsie Belle</b>":`“${correct} solved. Reasonable doubt remains extremely reasonable.”<br><b>— Bootsie Belle</b>`});}
+      function update(){setHud("Case",`${index+1}/5`,`Evidence`,`${found}/3`,clockActive?"Time":"Inspected",clockActive?time:inspected);}
+      function finish(){running=false;score+=correct*250;const stars=correct===5?3:correct>=4?2:correct>=3?1:0;completeGame({score,stars,title:correct===5?"Master Detective!":"Court Is Adjourned!",line:correct===5?"“Annoyingly competent. You may keep the badge.”<br><b>— Bootsie Belle</b>":`“${correct} cases solved. The remaining suspects have retained counsel.”<br><b>— Bootsie Belle</b>`});}
       return{start,stop(){running=false;},destroy(){running=false;runtime.clear();}};
     },
 
@@ -596,11 +605,11 @@
         const status=create("div","watch-status");status.id="watchStatus";status.innerHTML=`<b>Room ${room+1}/5:</b> Move the clutter. Then tap Bootsie!`;
         const hint=create("button","hint-button");hint.type="button";hint.textContent="💡 Hint −200";runtime.on(hint,"click",useHint);
         const cat=create("button","hidden-bootsie");cat.type="button";cat.innerHTML='<img src="assets/bootsie.webp" alt="Bootsie Belle">';cat.setAttribute("aria-label","Bootsie Belle—found her!");place(cat,spots[target].x,spots[target].y,34);runtime.on(cat,"click",catchBootsie);
-        shuffle(spots.slice(0,count).map((spot,i)=>({...spot,original:i}))).forEach((spot)=>{const btn=create("button","search-object");btn.type="button";btn.innerHTML=`<span>${spot.icon}</span><small>Move</small>`;btn.setAttribute("aria-label","Move this hiding place");place(btn,spot.x,spot.y,spot.original===target?48:42+spot.original);runtime.on(btn,"click",()=>moveObject(btn,spot.original===target));});
+        shuffle(spots.slice(0,count).map((spot,i)=>({...spot,original:i}))).forEach((spot)=>{const btn=create("button","search-object");btn.type="button";btn.innerHTML=`<span>${spot.icon}</span>`;btn.setAttribute("aria-label","Move this object and look behind it");place(btn,spot.x,spot.y,spot.original===target?48:42+spot.original);runtime.on(btn,"click",()=>moveObject(btn,spot.original===target));});
         update();
       }
       function moveObject(button,isTarget){
-        if(paused||!running||found||button.classList.contains("moved"))return;moves++;button.classList.add("moved");button.style.setProperty("--move-x",`${button.offsetLeft<stage.clientWidth/2?-75:75}px`);button.querySelector("small").textContent="Moved";score=Math.max(0,score-10);
+        if(paused||!running||found||button.classList.contains("moved"))return;moves++;button.classList.add("moved");button.style.setProperty("--move-x",`${button.offsetLeft<stage.clientWidth/2?-95:95}px`);score=Math.max(0,score-8);
         if(isTarget){document.querySelector(".hidden-bootsie")?.classList.add("revealed");const s=$("watchStatus");if(s)s.innerHTML="<b>There she is!</b> Tap Bootsie before she slips away.";popText(spots[target].x,spots[target].y-8,"FOUND HER?");beep(610,.08,"sine",.04);}else beep(240,.035,"square",.018);update();
       }
       function catchBootsie(){
@@ -619,39 +628,40 @@
     snailmail() {
       const runtime=makeRuntime();
       const levels=[
-        {name:"Garden Warm-Up",time:46,width:12,speed:.72,items:[{x:20,y:34},{x:31,y:47},{x:44,y:57},{x:58,y:64},{x:73,y:73}],sprinklers:[{x:45,y:58,phase:0}],blockers:[]},
-        {name:"Sprinkler Slalom",time:40,width:9,speed:.78,items:[{x:18,y:31},{x:29,y:44},{x:40,y:54},{x:52,y:61},{x:65,y:69},{x:78,y:76}],sprinklers:[{x:38,y:53,phase:0},{x:64,y:68,phase:2.5}],blockers:[{x:55,y:63,phase:1}]},
-        {name:"Parcel Panic",time:36,width:7.5,speed:.84,items:[{x:18,y:31,parcel:true},{x:28,y:43},{x:39,y:53,parcel:true},{x:51,y:61},{x:63,y:68,parcel:true},{x:74,y:73},{x:82,y:77,parcel:true}],sprinklers:[{x:32,y:47,phase:0},{x:54,y:62,phase:2},{x:73,y:73,phase:4}],blockers:[{x:44,y:57,phase:0},{x:68,y:70,phase:3}]}
+        {name:"Porch Launch",time:34,mail:5,turbos:2,hazards:1,blockers:0,max:1.02},
+        {name:"Sprinkler Speedway",time:31,mail:6,turbos:3,hazards:2,blockers:1,max:1.10},
+        {name:"Parcel Hyperdrive",time:29,mail:7,turbos:4,hazards:3,blockers:2,max:1.18}
       ];
-      const path=[{x:14,y:27},{x:27,y:42},{x:39,y:54},{x:53,y:61},{x:68,y:70},{x:86,y:79}];
-      let level=0,running=false,time=0,score=0,collected=0,totalWet=0,levelWet=0,totalOff=0,levelOff=0,player,items=[],sprinklers=[],blockers=[],last=0,raf=null,timer=null;
-      function start(){running=true;timer=runtime.every(tick,1000);startLevel();}
+      const spots=[{x:16,y:30},{x:27,y:43},{x:39,y:56},{x:51,y:35},{x:61,y:65},{x:72,y:45},{x:82,y:70},{x:33,y:72},{x:47,y:77},{x:68,y:27},{x:84,y:38},{x:20,y:63},{x:56,y:52},{x:75,y:78},{x:43,y:27}];
+      let level=0,running=false,time=0,score=0,player,mail=[],boosts=[],hazards=[],blockers=[],mailHit=0,chain=0,bestChain=0,turboUntil=0,last=0,totalHits=0;
+      function start(){running=true;runtime.every(tick,1000);startLevel();}
       function startLevel(){
-        world.innerHTML="";const cfg=levels[level];time=cfg.time;collected=0;levelWet=0;levelOff=0;items=[];sprinklers=[];blockers=[];
-        player=movingCharacter(runtime,{image:"assets/maggie-jean.webp",className:"maggie-player",x:13,y:26,speed:.22+level*.02,maxSpeed:cfg.speed,minX:6,maxX:93,minY:15,maxY:90});
-        cfg.items.forEach((pos)=>{const el=create("div","mail-item");el.textContent=pos.parcel?"📦":"✉️";place(el,pos.x,pos.y,32);items.push({...pos,hit:false,el});});
-        cfg.sprinklers.forEach((s)=>{const el=create("div","sprinkler");el.textContent="💦";place(el,s.x,s.y,28);sprinklers.push({...s,baseX:s.x,hitAt:0,el});});
-        cfg.blockers.forEach((s)=>{const el=create("div","route-blocker");el.textContent="🐿️";place(el,s.x,s.y,38);blockers.push({...s,baseY:s.y,hitAt:0,el});});
-        const goal=create("div","object collectible gold");goal.textContent="📫";place(goal,87,79,36);goal.style.opacity=".78";
-        const banner=create("div","route-banner");banner.textContent=`Route ${level+1}/3 · ${cfg.name}`;update();last=performance.now();raf=runtime.frame(loop);
+        world.innerHTML="";const cfg=levels[level];time=cfg.time;mailHit=0;chain=0;turboUntil=0;mail=[];boosts=[];hazards=[];blockers=[];
+        player=movingCharacter(runtime,{image:"assets/maggie-jean.webp",className:"maggie-player turbo-maggie",x:10,y:82,speed:.34,maxSpeed:cfg.max,minX:6,maxX:94,minY:16,maxY:89});
+        const chosen=shuffle(spots);let cursor=0;
+        for(let i=0;i<cfg.mail;i++){const pos=chosen[cursor++];const el=create("div","mail-item turbo-mail");el.textContent=i%3===2?"📦":"✉️";place(el,pos.x,pos.y,34);mail.push({...pos,hit:false,el,parcel:i%3===2});}
+        for(let i=0;i<cfg.turbos;i++){const pos=chosen[cursor++];const el=create("div","turbo-stamp");el.innerHTML="⚡<b>TURBO</b>";place(el,pos.x,pos.y,36);boosts.push({...pos,hit:false,el});}
+        for(let i=0;i<cfg.hazards;i++){const pos=chosen[cursor++];const el=create("div","sprinkler turbo-hazard");el.textContent="💦";place(el,pos.x,pos.y,31);hazards.push({...pos,baseX:pos.x,phase:i*2.2,hitAt:0,el});}
+        for(let i=0;i<cfg.blockers;i++){const pos=chosen[cursor++];const el=create("div","route-blocker turbo-blocker");el.textContent="🐿️";place(el,pos.x,pos.y,40);blockers.push({...pos,baseY:pos.y,phase:i*2.7,hitAt:0,el});}
+        const goal=create("div","turbo-mailbox");goal.textContent="📫";place(goal,90,20,48);
+        const banner=create("div","route-banner turbo-banner");banner.innerHTML=`Sprint ${level+1}/3 · <b>${cfg.name}</b><span id="turboReadout">Find a TURBO stamp!</span>`;
+        update();last=performance.now();runtime.frame(loop);
       }
-      function tick(){if(paused||!running)return;time--;const cfg=levels[level],d=distanceToPath(player.state);if(d>cfg.width){levelOff++;totalOff++;time=Math.max(0,time-1);warning("Off route! −1 second");}update();if(time<=0)finish(false);}
+      function tick(){if(paused||!running)return;time--;if(time<=8)document.querySelector(".turbo-banner")?.classList.add("urgent");update();if(time<=0)finish(false);}
       function loop(now){
-        if(!running)return;const dt=Math.min((now-last)/16.667,2.2);last=now;if(!paused){const cfg=levels[level];player.update(dt,.22+level*.02,cfg.speed);
-          items.forEach((item)=>{if(!item.hit&&distance(player.state,item)<7){item.hit=true;item.el.classList.add("collected");collected++;score+=item.parcel?500:300;popText(item.x,item.y,item.parcel?"PARCEL!":"STAMPED!");beep(630+collected*30,.07,"sine",.035);update();}});
-          sprinklers.forEach((s)=>{s.x=s.baseX+Math.sin(now/(720-level*90)+s.phase)*(5+level*1.4);place(s.el,s.x,s.y);if(now-s.hitAt>1050&&distance(player.state,s)<8){hitHazard(s,"SPLASH!",4);}});
-          blockers.forEach((s)=>{s.y=s.baseY+Math.sin(now/620+s.phase)*7;place(s.el,s.x,s.y);if(now-s.hitAt>1050&&distance(player.state,s)<8){hitHazard(s,"NUT BLOCK!",3);}});
-          if(collected===cfg.items.length&&distance(player.state,{x:87,y:79})<7)completeLevel();
-        }raf=runtime.frame(loop);
+        if(!running)return;const dt=Math.min((now-last)/16.667,2.2);last=now;if(!paused){const cfg=levels[level];const turbo=now<turboUntil;player.update(dt, turbo ? .58 : .34, turbo ? cfg.max*1.85 : cfg.max);player.el.classList.toggle("turboing",turbo);
+          mail.forEach(item=>{if(!item.hit&&distance(player.state,item)<7){item.hit=true;item.el.classList.add("collected");mailHit++;chain++;bestChain=Math.max(bestChain,chain);const gain=(item.parcel?420:260)*(1+Math.min(chain-1,4)*.25);score+=gain;popText(item.x,item.y,chain>=3?`${chain}× MAIL CHAIN!`:item.parcel?"PARCEL!":"DELIVERED!");beep(610+chain*35,.065,"sine",.035);update();}});
+          boosts.forEach(boost=>{if(!boost.hit&&distance(player.state,boost)<8){boost.hit=true;boost.el.classList.add("used");turboUntil=Math.max(turboUntil,now)+3800;score+=350;time=Math.min(time+2,cfg.time+5);const read=$("turboReadout");if(read)read.textContent="⚡ TURBO ACTIVE!";popText(boost.x,boost.y,"TURBOOO!");beep(820,.13,"square",.045);}});
+          hazards.forEach(h=>{h.x=h.baseX+Math.sin(now/620+h.phase)*(6+level*1.4);place(h.el,h.x,h.y);if(now-h.hitAt>1050&&distance(player.state,h)<8)hit(h,"SPLASH!",2);});
+          blockers.forEach(h=>{h.y=h.baseY+Math.sin(now/540+h.phase)*8;place(h.el,h.x,h.y);if(now-h.hitAt>1050&&distance(player.state,h)<8)hit(h,"SQUIRREL JAM!",2);});
+          if(now>=turboUntil){const read=$("turboReadout");if(read)read.textContent=boosts.some(b=>!b.hit)?"Find a TURBO stamp!":"Turbo spent — finish the mail!";}
+          if(mailHit===cfg.mail&&distance(player.state,{x:90,y:20})<8)completeLevel();
+        }runtime.frame(loop);
       }
-      function hitHazard(hazard,label,penalty){hazard.hitAt=performance.now();levelWet++;totalWet++;time=Math.max(0,time-penalty);score=Math.max(0,score-120);player.state.vx*=-1.6;player.state.vy*=-1.6;popText(hazard.x,hazard.y,label);beep(110,.12,"sawtooth",.04);update();}
-      function completeLevel(){
-        const cfg=levels[level];score+=time*35+Math.max(0,600-levelWet*120-levelOff*40);const finished=level+1;level++;if(level>=levels.length){finish(true);return;}running=false;showRound(`Route ${finished} Delivered`,cfg.name,`Next: ${levels[level].name}. More mail, faster hazards and a narrower safe path.`,`Start Route ${level+1}`,()=>{roundOverlay.hidden=true;running=true;startLevel();});
-      }
-      function distanceToPath(point){let best=Infinity;for(let i=0;i<path.length-1;i++){const a=path[i],b=path[i+1],dx=b.x-a.x,dy=b.y-a.y;const t=Math.max(0,Math.min(1,((point.x-a.x)*dx+(point.y-a.y)*dy)/(dx*dx+dy*dy)));const p={x:a.x+t*dx,y:a.y+t*dy};best=Math.min(best,distance(point,p));}return best;}
-      function warning(text){document.querySelector(".path-warning")?.remove();const el=create("div","path-warning",stage);el.textContent=text;runtime.later(()=>el.remove(),700);}
-      function update(){const need=levels[level]?.items.length||0;setHud("Route",`${Math.min(level+1,3)}/3`,"Mail",`${collected}/${need}`,"Time",time);}
-      function finish(won){if(!running)return;running=false;const stars=won?(totalWet===0&&totalOff<=2?3:totalWet<=4?2:1):(level>=1?1:0);completeGame({score,stars,title:won?"Three Special Deliveries!":"Return to Sender!",line:won?`“Three routes, ${totalWet} collisions, and the mail still arrived.”<br><b>— Bootsie Belle</b>`:"“Maggie Jean promises delivery sometime this month.”<br><b>— Bootsie Belle</b>"});}
+      function hit(h,label,penalty){h.hitAt=performance.now();totalHits++;chain=0;time=Math.max(0,time-penalty);score=Math.max(0,score-100);player.state.vx*=-1.8;player.state.vy*=-1.8;popText(h.x,h.y,label);beep(115,.12,"sawtooth",.04);update();}
+      function completeLevel(){const cfg=levels[level];score+=time*45+bestChain*90;const finished=level+1;level++;if(level>=levels.length){finish(true);return;}running=false;showRound(`Sprint ${finished} Delivered`,"Mailbox Slammed!",`Next: ${levels[level].name}. More mail, more TURBO stamps, and more things trying to ruin Maggie Jean's land-speed record.`,`Launch Sprint ${level+1}`,()=>{roundOverlay.hidden=true;running=true;startLevel();});}
+      function update(){const need=levels[level]?.mail||0;const turbo=Math.max(0,Math.ceil((turboUntil-performance.now())/1000));setHud("Sprint",`${Math.min(level+1,3)}/3`,"Mail",`${mailHit}/${need}`,turbo>0?"TURBO":"Time",turbo>0?`${turbo}s`:time);}
+      function finish(won){if(!running)return;running=false;const stars=won?(totalHits===0&&bestChain>=5?3:totalHits<=3?2:1):(level>=1?1:0);completeGame({score,stars,title:won?"SNAIL MAIL WENT SUPERSONIC!":"Turbo Delivery Wipeout!",line:won?`“I have filed a formal complaint with the laws of physics.”<br><b>— Bootsie Belle</b>`:`“At least traditional snail mail has fewer sprinkler incidents.”<br><b>— Bootsie Belle</b>`});}
       return{start,stop(){running=false;},destroy(){running=false;runtime.clear();}};
     }
   };
@@ -675,8 +685,10 @@
     if(event.key==="Escape"&&!playScreen.hidden)showArcade();
   },{passive:false});
   window.addEventListener("keyup",(event)=>heldKeys.delete(event.key.length===1?event.key.toLowerCase():event.key));
-  window.addEventListener("blur",()=>{if(currentModule&&!paused)togglePause(true);});
-  document.addEventListener("visibilitychange",()=>{if(document.hidden&&currentModule&&!paused)togglePause(true);});
+  document.addEventListener("visibilitychange",()=>{
+    if(!document.hidden||!currentModule||paused||!resultOverlay.hidden||!roundOverlay.hidden||!instructionOverlay.hidden)return;
+    setTimeout(()=>{if(document.hidden&&currentModule&&!paused&&resultOverlay.hidden&&roundOverlay.hidden&&instructionOverlay.hidden)togglePause(true);},250);
+  });
 
   renderArcade();
   if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
