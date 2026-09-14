@@ -11,9 +11,25 @@
   <link rel="preload" href="assets/living-room.webp" as="image">
   <link rel="preload" href="assets/backyard.webp" as="image">
   <link rel="preload" href="assets/acorn-green.webp" as="image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <header class="site-branding">
+    <a class="site-banner" href="../" aria-label="Sisters of Summerville home">
+      <img src="../images/sos-banner.png" alt="Sisters of Summerville">
+    </a>
+    <nav class="site-nav" aria-label="Sisters of Summerville">
+      <a class="nav-link" href="../">📖 Comics</a>
+      <a class="nav-link" href="../#characters">🐾 Characters</a>
+      <a class="nav-link" href="../#about">🎨 About</a>
+      <a class="nav-link" href="../#subscribe">💌 Subscribe</a>
+      <a class="nav-link" href="../#blog">📝 Blog</a>
+      <a class="nav-link active" href="./" aria-current="page">🎮 Arcade</a>
+    </nav>
+  </header>
   <main class="app-shell">
     <section class="arcade-frame" aria-label="Sisters of Summerville Arcade">
       <header class="top-bar">
@@ -25,7 +41,7 @@
           <span class="wallet-item"><b id="totalStars">0</b> ★ <small>Stars</small></span>
           <span class="wallet-item"><b id="totalTickets">0</b> 🎟️ <small>Treat Tickets</small></span>
         </div>
-        <a class="comic-link" href="https://sisters-of-summerville.github.io/" aria-label="Back to the Sisters of Summerville comics">← Comics</a>
+        <a class="comic-link" href="https://sisters-of-summerville.github.io/" aria-label="Back to the Sisters of Summerville comics">← Main Site</a>
         <button id="soundButton" class="round-button" type="button" aria-label="Turn sound off" aria-pressed="true">♪</button>
       </header>
 

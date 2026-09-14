@@ -36,8 +36,8 @@
       id: "acorn", title: "The Acorn Open", kicker: "Three-Green Challenge",
       description: "Putt acorns past water and sand while Caddy Hack provides highly questionable advice.",
       background: "assets/acorn-green.webp", character: "assets/caddy-hack.webp",
-      instructions: "Touch the acorn, drag the bright arrow TOWARD the one cup, then release. The power meter shows the exact shot strength. Keep the acorn on the green—sand kills momentum and takes a strong recovery shot.",
-      rewards: ["One cup per green", "Clear aim + power meter", "Punishing sand traps"], button: "Tee Off"
+      instructions: "Touch the acorn and drag the aiming arrow exactly where you want the shot to travel. The moving target marker shows direction while the distance meter gives SHORT, MEDIUM or LONG power before you release.",
+      rewards: ["Live aiming reticle", "Short / medium / long distance control", "Punishing sand traps"], button: "Tee Off"
     },
     {
       id: "paworder", title: "Paw & Order", kicker: "Cushion Crimes Unit",
@@ -142,7 +142,28 @@
     setHud("Ready", "—", "Best", progress.games[id]?.best || 0, "Stars", `${progress.games[id]?.stars || 0}/3`);
   }
 
+  function enterGameFullscreen() {
+    const frame = document.querySelector(".arcade-frame");
+    document.body.classList.add("game-fullscreen");
+    try {
+      const request = frame?.requestFullscreen || frame?.webkitRequestFullscreen;
+      if (request && !document.fullscreenElement && !document.webkitFullscreenElement) {
+        const result = request.call(frame);
+        result?.catch?.(() => {});
+      }
+    } catch (_) { /* iPad/Safari can use the CSS fullscreen fallback. */ }
+  }
+
+  function leaveGameFullscreen() {
+    document.body.classList.remove("game-fullscreen");
+    try {
+      if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch?.(() => {});
+      else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+    } catch (_) { /* Fullscreen exit is best effort. */ }
+  }
+
   function launchCurrentGame() {
+    enterGameFullscreen();
     instructionOverlay.hidden = true;
     resultOverlay.hidden = true;
     roundOverlay.hidden = true;
@@ -168,6 +189,7 @@
   }
 
   function showArcade() {
+    leaveGameFullscreen();
     cleanupGame();
     playScreen.hidden = true;
     arcadeScreen.hidden = false;
@@ -507,31 +529,35 @@
         {name:"Azalea Green",start:{x:49,y:76},cup:{x:75,y:23},par:3},
         {name:"Champion Green",start:{x:20,y:48},cup:{x:75,y:23},par:4}
       ];
-      let hole=0,strokes=0,holeStrokes=0,score=0,running=false,ball=null,ballEl=null,cupEl=null,aimEl=null,aiming=false,moving=false,raf=null,last=0,inSand=false;
+      let hole=0,strokes=0,holeStrokes=0,score=0,running=false,ball=null,ballEl=null,cupEl=null,aimEl=null,targetEl=null,aiming=false,moving=false,raf=null,last=0,inSand=false,aimPower=0;
       function start(){
         world.innerHTML="";running=true;backgroundLayer.style.backgroundImage='url("assets/acorn-green.webp")';
         const caddy=create("img","course-character");caddy.src="assets/caddy-hack.webp";caddy.alt="Caddy Hack";
         runtime.on(stage,"pointerdown",down);runtime.on(stage,"pointermove",move);runtime.on(stage,"pointerup",up);runtime.on(stage,"pointercancel",up);startHole();last=performance.now();raf=runtime.frame(loop);
       }
       function startHole(){
-        world.querySelectorAll(".golf-ball,.golf-hole,.power-readout,.aim-line,.green-label").forEach(el=>el.remove());
-        ball={...greens[hole].start,vx:0,vy:0};holeStrokes=0;moving=false;aiming=false;inSand=false;
-        cupEl=create("div","golf-hole");place(cupEl,greens[hole].cup.x,greens[hole].cup.y,20);cupEl.setAttribute("aria-label","The only cup on this green");
-        ballEl=create("button","golf-ball");ballEl.type="button";ballEl.textContent="🌰";ballEl.setAttribute("aria-label","Acorn ball. Touch and drag toward the cup.");place(ballEl,ball.x,ball.y,46);
+        world.querySelectorAll(".golf-ball,.golf-hole,.power-readout,.aim-line,.aim-target,.green-label").forEach(el=>el.remove());
+        ball={...greens[hole].start,vx:0,vy:0};holeStrokes=0;moving=false;aiming=false;inSand=false;aimPower=0;
+        cupEl=create("div","golf-hole");place(cupEl,greens[hole].cup.x,greens[hole].cup.y,20);cupEl.setAttribute("aria-label","The cup on this green");
+        ballEl=create("button","golf-ball");ballEl.type="button";ballEl.textContent="🌰";ballEl.setAttribute("aria-label","Acorn ball. Touch and drag toward your target.");place(ballEl,ball.x,ball.y,46);
         const label=create("div","green-label");label.textContent=`Green ${hole+1}/3 · ${greens[hole].name} · Par ${greens[hole].par}`;
-        const power=create("div","power-readout");power.id="powerReadout";power.innerHTML='<b>Touch the acorn</b><span class="power-track"><i id="puttPower"></i></span><small>Drag the arrow TOWARD the cup</small>';
+        const power=create("div","power-readout");power.id="powerReadout";power.innerHTML='<b>Touch the acorn to aim</b><span class="power-track"><i id="puttPower"></i><em class="power-third short">SHORT</em><em class="power-third medium">MED</em><em class="power-third long">LONG</em></span><small>Drag the target where you want the acorn to go, then release</small>';
         update();last=performance.now();
       }
-      function down(event){if(paused||moving||!running)return;const p=eventPoint(event);if(distance(p,ball)<13){aiming=true;stage.setPointerCapture?.(event.pointerId);setAim(p);}}
+      function down(event){if(paused||moving||!running)return;const p=eventPoint(event);if(distance(p,ball)<14){aiming=true;stage.setPointerCapture?.(event.pointerId);setAim(p);}}
       function move(event){if(aiming&&!paused)setAim(eventPoint(event));}
       function setAim(p){
-        const dx=p.x-ball.x,dy=p.y-ball.y,len=Math.min(34,Math.hypot(dx,dy));if(!len)return;
-        if(!aimEl)aimEl=create("div","aim-line");aimEl.style.left=`${ball.x}%`;aimEl.style.top=`${ball.y}%`;aimEl.style.width=`${Math.max(7,len*1.05)}%`;aimEl.style.transform=`rotate(${Math.atan2(dy,dx)*180/Math.PI}deg)`;
-        const pct=Math.round(len/34*100),bar=$("puttPower");if(bar)bar.style.transform=`scaleX(${pct/100})`;const readout=$("powerReadout");if(readout)readout.querySelector("b").textContent=`Power ${pct}%${inSand?" · SAND PENALTY":""}`;
+        const dx=p.x-ball.x,dy=p.y-ball.y,raw=Math.hypot(dx,dy);if(raw<.2)return;const len=Math.min(38,raw),angle=Math.atan2(dy,dx)*180/Math.PI;
+        if(!aimEl)aimEl=create("div","aim-line");
+        aimEl.style.left=`${ball.x}%`;aimEl.style.top=`${ball.y}%`;aimEl.style.width=`${Math.max(5,len)}%`;aimEl.style.transform=`translateY(-50%) rotate(${angle}deg)`;
+        if(!targetEl){targetEl=create("div","aim-target");targetEl.innerHTML='<span>+</span>';}
+        const ratio=len/Math.max(raw,.01);const tx=ball.x+dx*ratio,ty=ball.y+dy*ratio;place(targetEl,tx,ty,47);
+        aimPower=Math.round(len/38*100);const bar=$("puttPower");if(bar)bar.style.transform=`scaleX(${aimPower/100})`;
+        const range=aimPower<34?"SHORT":aimPower<68?"MEDIUM":"LONG";const readout=$("powerReadout");if(readout)readout.querySelector("b").textContent=`${range} · ${aimPower}% power${inSand?" · SAND PENALTY":""}`;
       }
       function up(event){
-        if(!aiming||paused)return;aiming=false;const p=eventPoint(event),dx=p.x-ball.x,dy=p.y-ball.y,len=Math.min(34,Math.hypot(dx,dy));aimEl?.remove();aimEl=null;
-        const raw=Math.hypot(dx,dy);if(len<3){resetReadout();return;}const sandShot=isSand(ball),power=Math.min(2.75,len*.086)*(sandShot ? .46 : 1);ball.vx=dx/Math.max(raw,.01)*power;ball.vy=dy/Math.max(raw,.01)*power;moving=true;strokes++;holeStrokes++;ballEl.classList.add("moving");if(sandShot)popText(ball.x,ball.y,"DIG IT OUT!");beep(185,.06,"square",.04);update();
+        if(!aiming||paused)return;aiming=false;const p=eventPoint(event),dx=p.x-ball.x,dy=p.y-ball.y,raw=Math.hypot(dx,dy),len=Math.min(38,raw);aimEl?.remove();targetEl?.remove();aimEl=null;targetEl=null;
+        if(len<3){resetReadout();return;}const sandShot=isSand(ball),power=Math.min(2.95,len*.078)*(sandShot ? .48 : 1);ball.vx=dx/Math.max(raw,.01)*power;ball.vy=dy/Math.max(raw,.01)*power;moving=true;strokes++;holeStrokes++;ballEl.classList.add("moving");if(sandShot)popText(ball.x,ball.y,"DIG IT OUT!");beep(185,.06,"square",.04);update();
       }
       function isSand(p){return p.x>82&&p.y>39&&p.y<76;}
       function keepOnGreen(){
@@ -546,9 +572,9 @@
         }
         raf=runtime.frame(loop);
       }
-      function resetReadout(){const r=$("powerReadout");if(r){r.querySelector("b").textContent=inSand?"Sand: use full power":"Touch the acorn";const bar=$("puttPower");if(bar)bar.style.transform="scaleX(0)";}}
-      function sink(){moving=false;ballEl.classList.add("collected");score+=Math.max(350,1800-holeStrokes*185);popText(ball.x,ball.y,holeStrokes<=greens[hole].par?"UNDER PAR!":"IN THE CUP!");beep(720,.12,"sine",.04);runtime.later(()=>{hole++;if(hole<greens.length){showRound(`Green ${hole} Complete`,`${holeStrokes} Strokes`,`Next is ${greens[hole].name}, par ${greens[hole].par}. There is still only one cup—and the sand is still trouble.`,`Play Green ${hole+1}`,()=>{roundOverlay.hidden=true;startHole();});}else finish();},650);}
-      function update(){setHud("Green",`${hole+1}/3`,`Strokes`,strokes,"Par",greens[hole]?.par||"—");}
+      function resetReadout(){const r=$("powerReadout");if(r){r.querySelector("b").textContent=inSand?"Sand shot — use LONG power":"Touch the acorn to aim";const bar=$("puttPower");if(bar)bar.style.transform="scaleX(0)";}}
+      function sink(){moving=false;ballEl.classList.add("collected");score+=Math.max(350,1800-holeStrokes*185);popText(ball.x,ball.y,holeStrokes<=greens[hole].par?"UNDER PAR!":"IN THE CUP!");beep(720,.12,"sine",.04);runtime.later(()=>{hole++;if(hole<greens.length){showRound(`Green ${hole} Complete`,`${holeStrokes} Strokes`,`Next is ${greens[hole].name}, par ${greens[hole].par}. Aim with the target reticle and choose your distance before releasing.`,`Play Green ${hole+1}`,()=>{roundOverlay.hidden=true;startHole();});}else finish();},650);}
+      function update(){setHud("Green",`${hole+1}/3`,"Strokes",strokes,"Par",greens[hole]?.par||"—");}
       function finish(){running=false;score+=Math.max(0,3600-strokes*190);const stars=strokes<=9?3:strokes<=13?2:1;completeGame({score,stars,title:strokes<=9?"Squirrel Tour Qualified!":"Acorn Open Complete!",line:`“${strokes} strokes, three greens, and exactly three cups total. Finally.”<br><b>— Bootsie Belle</b>`});}
       return{start,stop(){running=false;},destroy(){running=false;runtime.clear();}};
     },
@@ -597,7 +623,7 @@
 
     watch() {
       const runtime=makeRuntime();
-      const spots=[{x:18,y:33,icon:"🧺"},{x:31,y:58,icon:"📦"},{x:44,y:37,icon:"🛋️"},{x:55,y:66,icon:"🛏️"},{x:67,y:37,icon:"🪴"},{x:80,y:55,icon:"🪑"},{x:22,y:73,icon:"🧸"},{x:40,y:76,icon:"🧳"},{x:61,y:76,icon:"🧶"},{x:76,y:72,icon:"🛍️"},{x:88,y:34,icon:"🧥"},{x:51,y:24,icon:"📚"}];
+      const spots=[{x:18,y:33,icon:"🧺",label:"laundry basket"},{x:31,y:58,icon:"📦",label:"moving box"},{x:44,y:37,icon:"🎁",label:"large gift box"},{x:55,y:66,icon:"🧳",label:"suitcase"},{x:67,y:37,icon:"🪴",label:"large plant"},{x:80,y:55,icon:"🛍️",label:"shopping bags"},{x:22,y:73,icon:"🧺",label:"blanket basket"},{x:40,y:76,icon:"📦",label:"storage box"},{x:61,y:76,icon:"🧳",label:"travel bag"},{x:76,y:72,icon:"🎁",label:"package"},{x:88,y:34,icon:"🧥",label:"coat pile"},{x:51,y:24,icon:"🪴",label:"floor plant"}];
       let room=0,score=0,running=false,time=0,timer=null,target=-1,moves=0,hints=0,found=false;
       function start(){backgroundLayer.style.backgroundImage='url("assets/bootsie-search-room.webp")';running=true;timer=runtime.every(tick,1000);startRoom();}
       function startRoom(){
@@ -605,7 +631,7 @@
         const status=create("div","watch-status");status.id="watchStatus";status.innerHTML=`<b>Room ${room+1}/5:</b> Move the clutter. Then tap Bootsie!`;
         const hint=create("button","hint-button");hint.type="button";hint.textContent="💡 Hint −200";runtime.on(hint,"click",useHint);
         const cat=create("button","hidden-bootsie");cat.type="button";cat.innerHTML='<img src="assets/bootsie.webp" alt="Bootsie Belle">';cat.setAttribute("aria-label","Bootsie Belle—found her!");place(cat,spots[target].x,spots[target].y,34);runtime.on(cat,"click",catchBootsie);
-        shuffle(spots.slice(0,count).map((spot,i)=>({...spot,original:i}))).forEach((spot)=>{const btn=create("button","search-object");btn.type="button";btn.innerHTML=`<span>${spot.icon}</span>`;btn.setAttribute("aria-label","Move this object and look behind it");place(btn,spot.x,spot.y,spot.original===target?48:42+spot.original);runtime.on(btn,"click",()=>moveObject(btn,spot.original===target));});
+        shuffle(spots.slice(0,count).map((spot,i)=>({...spot,original:i}))).forEach((spot)=>{const btn=create("button","search-object");btn.type="button";btn.innerHTML=`<span>${spot.icon}</span>`;btn.setAttribute("aria-label",`Move the ${spot.label} and look behind it`);place(btn,spot.x,spot.y,spot.original===target?48:42+spot.original);runtime.on(btn,"click",()=>moveObject(btn,spot.original===target));});
         update();
       }
       function moveObject(button,isTarget){
@@ -685,6 +711,8 @@
     if(event.key==="Escape"&&!playScreen.hidden)showArcade();
   },{passive:false});
   window.addEventListener("keyup",(event)=>heldKeys.delete(event.key.length===1?event.key.toLowerCase():event.key));
+  document.addEventListener("fullscreenchange",()=>{if(!document.fullscreenElement&&currentModule)document.body.classList.add("game-fullscreen");});
+  document.addEventListener("webkitfullscreenchange",()=>{if(!document.webkitFullscreenElement&&currentModule)document.body.classList.add("game-fullscreen");});
   document.addEventListener("visibilitychange",()=>{
     if(!document.hidden||!currentModule||paused||!resultOverlay.hidden||!roundOverlay.hidden||!instructionOverlay.hidden)return;
     setTimeout(()=>{if(document.hidden&&currentModule&&!paused&&resultOverlay.hidden&&roundOverlay.hidden&&instructionOverlay.hidden)togglePause(true);},250);
