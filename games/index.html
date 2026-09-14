@@ -3,49 +3,29 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#0b0b13">
+  <meta name="theme-color" content="#8f281e">
   <meta name="description" content="Six playable Sisters of Summerville comic adventures in one colorful 2.5D arcade.">
   <title>Sisters of Summerville Arcade</title>
-  <link rel="canonical" href="https://sisters-of-summerville.github.io/games/">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" href="assets/icon-192.png">
   <link rel="preload" href="assets/living-room.webp" as="image">
   <link rel="preload" href="assets/backyard.webp" as="image">
   <link rel="preload" href="assets/acorn-green.webp" as="image">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="site-banner">
-    <a href="../" aria-label="Sisters of Summerville comics">
-      <img src="../images/sos-banner.png" alt="Sisters of Summerville">
-    </a>
-  </header>
-  <nav class="site-nav" aria-label="Sisters of Summerville">
-    <a class="nav-link" href="../">📖 Comics</a>
-    <a class="nav-link" href="../#characters">🐾 Characters</a>
-    <a class="nav-link" href="../#about">🎨 About</a>
-    <a class="nav-link" href="../#subscribe">💌 Subscribe</a>
-    <a class="nav-link" href="../#blog">📝 Blog</a>
-    <a class="nav-link active" href="./" aria-current="page">🎮 Arcade</a>
-  </nav>
-  <div class="games-section-head">
-    <h1>🎮 Chaos Arcade</h1>
-    <div class="accent-line"></div>
-    <p>Playable adventures starring the residents of Summerville</p>
-  </div>
   <main class="app-shell">
     <section class="arcade-frame" aria-label="Sisters of Summerville Arcade">
       <header class="top-bar">
         <div class="brand-lockup" aria-label="Sisters of Summerville Arcade">
-          <span class="arcade-name">Player Desk</span>
+          <span class="brand-name">Sisters <small>of Summerville</small></span>
+          <span class="arcade-name">Chaos Arcade</span>
         </div>
         <div class="reward-wallet" aria-label="Arcade rewards">
           <span class="wallet-item"><b id="totalStars">0</b> ★ <small>Stars</small></span>
           <span class="wallet-item"><b id="totalTickets">0</b> 🎟️ <small>Treat Tickets</small></span>
         </div>
+        <a class="comic-link" href="https://sisters-of-summerville.github.io/" aria-label="Back to the Sisters of Summerville comics">← Comics</a>
         <button id="soundButton" class="round-button" type="button" aria-label="Turn sound off" aria-pressed="true">♪</button>
       </header>
 
@@ -139,11 +119,6 @@
       </section>
     </section>
   </main>
-  <footer class="site-footer">
-    <div>🐾 <strong>Sisters of Summerville</strong> · Daily Comic Strip · Summerville, SC</div>
-    <div>Creative partnership between Artist + AI</div>
-    <div class="footer-tags">#SistersOfSummerville #YorkieLife #TuxedoCat #PetComedy #AIChaos</div>
-  </footer>
   <script src="game.js" defer></script>
 </body>
 </html>
