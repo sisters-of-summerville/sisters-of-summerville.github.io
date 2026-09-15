@@ -17,6 +17,15 @@
   const coachImage = $("coachImage");
   const announcement = $("announcement");
 
+  function updateArcadeViewportHeight() {
+    const height = Math.round(window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight);
+    if (height > 0) document.documentElement.style.setProperty("--arcade-vh", `${height}px`);
+  }
+  updateArcadeViewportHeight();
+  window.addEventListener("resize", updateArcadeViewportHeight, { passive: true });
+  window.visualViewport?.addEventListener("resize", updateArcadeViewportHeight, { passive: true });
+  window.visualViewport?.addEventListener("scroll", updateArcadeViewportHeight, { passive: true });
+
   const games = [
     {
       id: "roomba", title: "Roomba Rodeo", kicker: "Three-Round Challenge",
@@ -153,6 +162,7 @@
 
   function enterGameFullscreen() {
     const frame = document.querySelector(".arcade-frame");
+    updateArcadeViewportHeight();
     document.body.classList.add("game-fullscreen");
     try {
       const request = frame?.requestFullscreen || frame?.webkitRequestFullscreen;
@@ -164,6 +174,7 @@
   }
 
   function leaveGameFullscreen() {
+    updateArcadeViewportHeight();
     document.body.classList.remove("game-fullscreen");
     try {
       if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch?.(() => {});
@@ -861,13 +872,13 @@
     if(event.key==="Escape"&&!playScreen.hidden)showArcade();
   },{passive:false});
   window.addEventListener("keyup",(event)=>heldKeys.delete(event.key.length===1?event.key.toLowerCase():event.key));
-  document.addEventListener("fullscreenchange",()=>{if(!document.fullscreenElement&&currentModule)document.body.classList.add("game-fullscreen");});
-  document.addEventListener("webkitfullscreenchange",()=>{if(!document.webkitFullscreenElement&&currentModule)document.body.classList.add("game-fullscreen");});
+  document.addEventListener("fullscreenchange",()=>{updateArcadeViewportHeight();if(!document.fullscreenElement&&currentModule)document.body.classList.add("game-fullscreen");});
+  document.addEventListener("webkitfullscreenchange",()=>{updateArcadeViewportHeight();if(!document.webkitFullscreenElement&&currentModule)document.body.classList.add("game-fullscreen");});
   document.addEventListener("visibilitychange",()=>{
     if(Date.now()<ignoreVisibilityPauseUntil||!document.hidden||!currentModule||paused||!resultOverlay.hidden||!roundOverlay.hidden||!instructionOverlay.hidden)return;
     setTimeout(()=>{if(Date.now()>=ignoreVisibilityPauseUntil&&document.hidden&&currentModule&&!paused&&resultOverlay.hidden&&roundOverlay.hidden&&instructionOverlay.hidden)togglePause(true);},250);
   });
 
   renderArcade();
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=11").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=12").catch(()=>{}));
 })();
