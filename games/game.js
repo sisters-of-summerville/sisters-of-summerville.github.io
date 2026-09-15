@@ -54,11 +54,11 @@
       rewards: ["Five search rooms", "Movable hiding places", "Speed + no-hint bonuses"], button: "Start Searching"
     },
     {
-      id: "gooserescue", title: "Radar’s Goose Rescue!", kicker: "Guardian of the Golf Course",
-      description: "Follow Radar’s clues, find an injured Beau, call the experts, and help reunite him with Belle.",
-      background: "assets/acorn-green.webp", character: "assets/radar.png",
-      instructions: "Search the golf course for Radar’s trail clues and find Beau tangled in fishing line. Then choose the safe rescue steps and guide the wildlife rescuer through each snag without frightening Beau.",
-      rewards: ["Search for real clues", "Make the rescue call", "Careful line-removal finale"], button: "START THE RESCUE"
+      id: "gooserescue", title: "Radar’s Goose Rescue!", kicker: "A Good Dog. A Goose in Trouble.",
+      description: "Find Beau tangled beside the pond, fetch Meemaw, and lead a wildlife rescuer back along the trail.",
+      background: "assets/pond-rescue.png", character: "assets/radar.png",
+      instructions: "Tap the dirt trail or drag to steer Radar. Follow three clues to Beau, then run back to alert Meemaw. Time your barks to get her attention, lead the wildlife rescuer back without losing her, and keep Radar steady while she frees Beau.",
+      rewards: ["Explore the pond trail", "Fetch help + lead the rescuer", "Timing challenges + rescue stars"], button: "START THE RESCUE"
     },
     {
       id: "snailmail", title: "Snail Mail: TURBO!", kicker: "Maggie Jean Goes Supersonic",
@@ -664,93 +664,133 @@
     },
 
     gooserescue() {
-      const runtime=makeRuntime();
-      const searchSpots=[
-        {x:16,y:29,icon:"🌾",label:"reeds"},{x:31,y:53,icon:"🪨",label:"pond rocks"},
-        {x:47,y:26,icon:"🌳",label:"shade tree"},{x:64,y:47,icon:"🪵",label:"fallen branch"},
-        {x:78,y:27,icon:"🪑",label:"course bench"},{x:84,y:67,icon:"🌿",label:"thick brush"},
-        {x:54,y:73,icon:"🌼",label:"flower bed"},{x:26,y:75,icon:"🛺",label:"golf cart"}
+      const runtime = makeRuntime();
+      const clues = [
+        {x:30,y:70,icon:"feather",name:"A goose feather",message:"A feather on the trail. Radar has a scent!"},
+        {x:51,y:54,icon:"line",name:"Discarded fishing line",message:"Fishing line leads toward the reeds. Someone needs help."},
+        {x:74,y:44,icon:"paws",name:"A distressed honk",message:"Beau is tangled at the pond bank! Go back and alert Meemaw."}
       ];
-      const decisions=[
-        {prompt:"Beau is frightened and tangled. What should Meemaw do first?",correct:"Keep Radar back and approach slowly",choices:["Keep Radar back and approach slowly","Send Radar in to pull the line","Chase Beau into the open"]},
-        {prompt:"The line is tight around Beau. Who should handle the rescue?",correct:"Call a wildlife rescue expert",choices:["Cut everything immediately","Call a wildlife rescue expert","Wait and hope it falls off"]},
-        {prompt:"Help is coming. How can Meemaw protect Beau meanwhile?",correct:"Stay nearby, quiet, and keep people away",choices:["Feed him from her hand","Stay nearby, quiet, and keep people away","Move him to the golf green"]}
-      ];
-      const snags=[
-        {x:33,y:65,label:"Loose line on grass",short:"GRASS"},
-        {x:42,y:45,label:"Loop beside the left wing",short:"WING"},
-        {x:59,y:42,label:"Line crossing Beau’s back",short:"BACK"},
-        {x:66,y:61,label:"Loop beside the right foot",short:"FOOT"},
-        {x:52,y:70,label:"Last free end below Beau",short:"FREE END"}
-      ];
-      let running=false,phase=0,score=0,mistakes=0,calm=100,clues=0,inspected=0,decision=0,snag=0,found=false;
-      function sprite(image,cls,x,y,w,alt=""){const el=create("div",`rescue-sprite ${cls}`);el.innerHTML=`<img src="${image}" alt="${alt}">`;el.style.width=w;place(el,x,y,40+Math.round(y));return el;}
-      function panel(kicker,title,text){const el=create("div","rescue-mission-panel");el.innerHTML=`<span>${kicker}</span><b>${title}</b><small>${text}</small>`;return el;}
-      function status(text){let el=$("rescueStatus");if(!el){el=create("div","rescue-status");el.id="rescueStatus";}el.textContent=text;}
-      function start(){running=true;renderSearch();}
-      function renderSearch(){
-        phase=0;world.innerHTML="";coach.hidden=true;panel("PART 1 OF 3","Follow Radar’s Clues","Search natural hiding places. Three clues will lead you to Beau.");
-        sprite("assets/meemaw.png","meemaw-rescue",91,78,"clamp(82px,10vw,132px)","Meemaw Grace");
-        sprite("assets/radar.png","radar-rescue",10,78,"clamp(100px,12vw,155px)","Radar");
-        const order=shuffle(searchSpots.map((_,i)=>i));const clueSet=new Set(order.slice(0,3));const beauSpot=order[3];
-        searchSpots.forEach((spot,index)=>{const btn=create("button","rescue-search-spot");btn.type="button";btn.innerHTML=`<span>${spot.icon}</span><b>${spot.label}</b>`;btn.setAttribute("aria-label",`Search the ${spot.label}`);place(btn,spot.x,spot.y,45);runtime.on(btn,"click",()=>inspect(btn,index,clueSet,beauSpot));});
-        status("Tap around the course. Radar needs three clues before he can pinpoint Beau.");update();
+      const rocks = [{x:40,y:64,r:4},{x:64,y:57,r:4}];
+      const home = {x:13,y:81}, goose = {x:84,y:45};
+      let running=false, phase=0, clue=0, score=0, errors=0, barks=0, cuts=0, elapsed=0;
+      let clock=0, last=0, hitAt=-10, cooldown=0, meter=.5, radar, worker, meemaw, beau, belle;
+      let target={x:18,y:82}, trail=[], leadWaiting=false, clueEl, marker, action, heading, message, meterBox, needle, meterWindow;
+      let walking=false, pressing=false, settle=0;
+      const phaseNames=["Find Beau","Fetch Meemaw","Raise the alarm","Lead the rescuer","Free Beau","Beau is safe"];
+      function actor(file,name,x,y,cls){
+        const el=create("div",`pond-actor ${cls}`);el.innerHTML=`<img src="assets/${file}" alt="${name}"><span>${name}</span>`;
+        const a={el,x,y};draw(a);return a;
       }
-      function inspect(btn,index,clueSet,beauSpot){
-        if(!running||paused)return;if(btn.classList.contains("found")){renderDecisions();return;}if(btn.classList.contains("checked"))return;btn.classList.add("checked");inspected++;
-        if(clueSet.has(index)){clues++;score+=260;const words=["A strand of fishing line!","Fresh goose feathers!","Radar hears a worried honk!"];btn.classList.add("clue");btn.querySelector("b").textContent=words[clues-1];popText(parseFloat(btn.style.left),parseFloat(btn.style.top),`CLUE ${clues}!`);beep(620+clues*70,.08,"sine",.04);}
-        else if(index===beauSpot&&clues>=3){found=true;score+=700;btn.classList.remove("checked");btn.classList.add("found");btn.innerHTML='<img src="assets/beau.png" alt="Beau tangled in fishing line"><b>BEAU NEEDS HELP!</b>';status("Radar found Beau tangled near the pond. Tap Beau to begin the rescue plan.");popText(searchSpots[index].x,searchSpots[index].y-10,"BEAU!");beep(760,.14,"square",.045);}
-        else if(index===beauSpot){btn.classList.remove("checked");status("Radar hears something here, but he needs more clues before approaching safely.");}
-        else{mistakes++;score=Math.max(0,score-25);btn.classList.add("empty");btn.querySelector("b").textContent="No sign here";beep(190,.035,"square",.018);}
-        if(clues===3&&!found)status("All three clues fit! Search near the pond for Beau.");update();
+      function draw(a){place(a.el,a.x,a.y,Math.round(a.y));}
+      function dist(a,b){return Math.hypot((a.x-b.x)*1.35,a.y-b.y);}
+      function hint(text){message.textContent=text;announcement.textContent=text;}
+      function setPhase(next,text){
+        phase=next;world.dataset.rescuePhase=String(phase);heading.textContent=phaseNames[phase];hint(text);
+        radar.el.classList.remove("walking");walking=false;target={x:radar.x,y:radar.y};pressing=false;cooldown=0;
+        meterBox.hidden=phase!==2&&phase!==4;
+        marker.hidden=phase===2||phase>=4;
+        if(phase===1)place(marker,home.x,home.y,3);
+        if(phase===3)place(marker,76,48,3);
+        action.disabled=false;update();
       }
-      function renderDecisions(){
-        phase=1;world.innerHTML="";panel("PART 2 OF 3","Protect Beau","Choose the safest action at each step. Rushing will lower Beau’s calm.");
-        sprite("assets/radar.png","radar-rescue waiting",14,78,"clamp(100px,12vw,155px)","Radar waiting at a safe distance");
-        sprite("assets/meemaw.png","meemaw-rescue",84,77,"clamp(86px,10vw,138px)","Meemaw Grace");
-        sprite("assets/beau.png","goose-rescue injured-goose",50,64,"clamp(105px,13vw,180px)","Beau tangled in fishing line");
-        const card=create("div","rescue-choice-card");card.id="rescueChoiceCard";renderQuestion(card);status("Read the situation, then choose what Meemaw should do.");update();
+      function start(){
+        running=true;world.innerHTML="";world.classList.add("pond-world");stage.classList.add("pond-stage");coach.hidden=true;
+        const brief=create("div","pond-brief");brief.innerHTML='<small>RADAR’S POND-BANK RESCUE</small><strong id="pondHeading"></strong><p id="pondMessage" role="status"></p>';
+        heading=$("pondHeading");message=$("pondMessage");
+        rocks.forEach(r=>{const rock=create("div","pond-rock pond-prop prop-rock");place(rock,r.x,r.y,Math.round(r.y));});
+        marker=create("div","pond-destination");marker.innerHTML='<span class="pond-prop prop-paws"></span>';marker.setAttribute("aria-hidden","true");
+        meemaw=actor("meemaw.png","Meemaw",home.x,home.y,"pond-meemaw");
+        beau=actor("beau.png","Beau",goose.x,goose.y,"pond-goose tangled");beau.el.hidden=true;
+        belle=actor("belle.png","Belle",91,51,"pond-goose");belle.el.hidden=true;
+        radar=actor("radar.png","Radar",18,82,"pond-radar");
+        const controls=create("div","pond-controls");
+        meterBox=create("div","pond-meter-box",controls);meterBox.innerHTML='<small id="pondMeterLabel">Tap when the marker reaches the gold zone</small><div class="pond-meter"><i class="pond-meter-window"></i><b class="pond-meter-needle"></b></div>';meterBox.hidden=true;
+        needle=meterBox.querySelector(".pond-meter-needle");meterWindow=meterBox.querySelector(".pond-meter-window");
+        action=create("button","pond-action",controls);action.type="button";runtime.on(action,"click",interact);
+        const help=create("span","pond-control-help",controls);help.textContent="Tap the trail or drag to move · Arrow keys / WASD · Enter to act";
+        runtime.on(stage,"pointerdown",e=>{if(!running||paused||e.target.closest("button,.overlay,.pond-controls,.pond-brief"))return;pressing=true;moveTarget(e);stage.setPointerCapture?.(e.pointerId);});
+        runtime.on(stage,"pointermove",e=>{if(pressing&&!paused)moveTarget(e);});
+        runtime.on(stage,"pointerup",()=>{pressing=false;});runtime.on(stage,"pointercancel",()=>{pressing=false;});
+        runtime.on(window,"keydown",e=>{if(e.key==="Enter"&&!e.repeat&&document.activeElement!==action)interact();});
+        setPhase(0,"Steer Radar to the feather on the dirt trail. Get close, then tap Sniff.");showClue();last=performance.now();runtime.frame(loop);
       }
-      function renderQuestion(card){
-        const item=decisions[decision];card.innerHTML=`<small>RESCUE DECISION ${decision+1} OF ${decisions.length}</small><h3>${item.prompt}</h3><div class="rescue-choices"></div><p id="choiceFeedback">Choose carefully—Beau’s calm matters.</p>`;
-        const holder=card.querySelector(".rescue-choices");shuffle(item.choices).forEach(choice=>{const btn=document.createElement("button");btn.type="button";btn.textContent=choice;holder.appendChild(btn);runtime.on(btn,"click",()=>choose(btn,choice,card));});
+      function moveTarget(e){if(![0,1,3].includes(phase))return;const p=eventPoint(e);target={x:Math.max(8,Math.min(92,p.x)),y:Math.max(39,Math.min(84,p.y))};}
+      function showClue(){
+        clueEl?.remove();const c=clues[clue];clueEl=create("div","pond-clue");clueEl.innerHTML=`<span class="pond-prop prop-${c.icon}"></span><small>${c.name}</small>`;place(clueEl,c.x,c.y,8);place(marker,c.x,c.y,3);
       }
-      function choose(btn,choice,card){
-        if(!running||paused)return;const item=decisions[decision];const feedback=$("choiceFeedback");
-        if(choice!==item.correct){mistakes++;calm=Math.max(20,calm-15);btn.disabled=true;btn.classList.add("wrong");feedback.textContent="That could frighten or hurt Beau. Try a safer choice.";beep(130,.1,"sawtooth",.04);update();return;}
-        score+=450;btn.classList.add("correct");feedback.textContent="Exactly right.";beep(690,.1,"sine",.04);decision++;
-        card.querySelectorAll("button").forEach(choiceButton=>{choiceButton.disabled=true;});
-        runtime.later(()=>{if(decision<decisions.length)renderQuestion(card);else renderUntangle();},550);update();
+      function stepActor(a,destination,speed,dt){
+        const dx=destination.x-a.x,dy=destination.y-a.y,d=Math.hypot(dx,dy);if(d<.2)return false;
+        const amount=Math.min(speed*dt,d);let nx=a.x+dx/d*amount,ny=a.y+dy/d*amount;
+        for(const r of rocks){const vx=(nx-r.x)*1.35,vy=ny-r.y,rd=Math.hypot(vx,vy);if(rd<r.r){
+          nx=r.x+(vx/(rd||1))*(r.r+.05)/1.35;ny=r.y+(vy/(rd||1))*(r.r+.05);
+          if(a===radar&&clock-hitAt>2){errors++;hitAt=clock;score=Math.max(0,score-35);popText(a.x,a.y-7,"AROUND THE ROCK!");}
+        }}
+        a.x=Math.max(8,Math.min(92,nx));a.y=Math.max(39,Math.min(84,ny));draw(a);return true;
       }
-      function renderUntangle(){
-        phase=2;world.innerHTML="";panel("PART 3 OF 3","Free Beau","The wildlife rescuer is here. Tap each named snag in the order she calls it.");
-        sprite("assets/meemaw.png","meemaw-rescue",88,77,"clamp(78px,9vw,126px)","Meemaw Grace");
-        sprite("assets/radar.png","radar-rescue waiting",12,78,"clamp(94px,11vw,148px)","Radar");
-        sprite("assets/belle.png","goose-rescue belle-waiting",77,48,"clamp(76px,8vw,120px)","Belle waiting nearby");
-        sprite("assets/beau.png","goose-rescue rescue-beau",50,62,"clamp(135px,16vw,220px)","Beau");
-        snags.forEach((item,index)=>{const btn=create("button","line-snag");btn.type="button";btn.dataset.index=index;btn.innerHTML=`<span>✂</span><b>${item.short}</b>`;btn.setAttribute("aria-label",item.label);place(btn,item.x,item.y,64);runtime.on(btn,"click",()=>cutSnag(btn,index));});
-        const call=create("div","rescuer-call");call.id="rescuerCall";call.innerHTML=`<small>WILDLIFE RESCUER SAYS</small><b>${snags[0].label}</b>`;
-        status("Guide the expert: tap the line location she names. Avoid guessing.");update();
+      function interact(){
+        if(!running||paused||cooldown>0||action.disabled)return;
+        if(phase===0&&dist(radar,clues[clue])<7){
+          score+=350;beep(640+clue*70,.1);hint(clues[clue].message);clue++;
+          if(clue<3)showClue();else{clueEl.remove();beau.el.hidden=false;belle.el.hidden=false;setPhase(1,"Beau’s foot is caught in fishing line. Leave him where he is—run back along the trail to Meemaw!");}
+        }else if(phase===1&&dist(radar,home)<10){
+          barks=0;setPhase(2,"Meemaw hasn’t noticed the emergency. Time three barks in the gold zone to get her attention.");
+        }else if(phase===2){
+          if(meter>=.32&&meter<=.68){barks++;score+=250;popText(radar.x,radar.y-10,"WOOF!");beep(230,.09,"square",.035);cooldown=.5;
+            if(barks===3){cooldown=2;action.disabled=true;hint("Meemaw: “Something’s wrong? I’m calling wildlife rescue. Show us the way, Radar!”");}}
+          else{errors++;cooldown=.55;hint("Try again when the marker reaches the gold zone. Three clear barks will get her attention.");beep(150,.08);}
+        }else if(phase===3&&dist(radar,{x:76,y:48})<10&&dist(worker,goose)<19){
+          worker.x=75;worker.y=49;draw(worker);meemaw.x=68;meemaw.y=62;draw(meemaw);radar.x=62;radar.y=75;draw(radar);
+          setPhase(4,"The rescuer is beside Beau. Keep Radar still: tap Steady when the marker is in the gold zone so she can make four careful snips.");
+        }else if(phase===4){
+          const half=.20-cuts*.025;
+          if(meter>=.5-half&&meter<=.5+half){cuts++;score+=600;cooldown=.75;beau.el.style.setProperty("--line-opacity",String(1-cuts/4));worker.el.classList.add("snipping");settle=.5;
+            popText(goose.x,goose.y-8,"SNIP!");beep(760,.1);hint(`${cuts} of 4 loops removed. ${cuts<4?"Let the rescuer settle, then time the next steady moment.":"The fishing line is off! Beau can stand freely again."}`);
+            if(cuts===4){beau.el.classList.remove("tangled");setPhase(5,"Beau is free! Belle hurries over while the rescue worker checks him. Good boy, Radar!");cooldown=2;}}
+          else{errors++;cooldown=.65;hint("Radar fidgeted. The rescuer waits—no harm done. Try again inside the gold zone.");beep(150,.08);}
+        }else if(phase===5){finish();}
+        update();
       }
-      function cutSnag(btn,index){
-        if(!running||paused||btn.classList.contains("cut"))return;
-        if(index!==snag){mistakes++;calm=Math.max(20,calm-10);btn.classList.add("mistake");runtime.later(()=>btn.classList.remove("mistake"),420);status("Wrong snag—check the rescuer’s instruction before cutting.");beep(120,.08,"sawtooth",.035);update();return;}
-        btn.classList.add("cut");score+=520;snag++;popText(snags[index].x,snags[index].y-7,"SAFE CUT!");beep(720+snag*35,.08,"sine",.04);
-        if(snag<snags.length){$("rescuerCall").querySelector("b").textContent=snags[snag].label;status(`${snag} of ${snags.length} snags cleared. Beau is staying calm.`);}
-        else runtime.later(reunion,650);update();
+      function arrive(){
+        worker=actor("wildlife-rescuer.png","Wildlife rescue",15,81,"pond-worker");
+        trail=[{x:radar.x,y:radar.y}];setPhase(3,"The rescue worker has arrived! Lead her to Beau’s paw marker. If you run too far ahead, return to her so she can follow.");
       }
-      function reunion(){
-        phase=3;world.innerHTML="";panel("RESCUE COMPLETE","Beau Is Free!","The fishing line is gone, and Belle can finally hurry over to him.");
-        sprite("assets/meemaw.png","meemaw-rescue reunion",86,77,"clamp(88px,10vw,140px)","Meemaw Grace");
-        sprite("assets/radar.png","radar-rescue reunion",17,78,"clamp(105px,12vw,160px)","Radar");
-        sprite("assets/beau.png","goose-rescue reunion beau",47,65,"clamp(115px,14vw,190px)","Beau");
-        sprite("assets/belle.png","goose-rescue reunion belle",59,65,"clamp(112px,13vw,185px)","Belle");
-        const banner=create("div","reunion-banner");banner.innerHTML="<b>BEAU + BELLE, TOGETHER AGAIN!</b><span>Radar found him. Meemaw called the experts. You guided the rescue.</span>";
-        status("Rescue complete—Beau is safe!");score+=Math.round(calm*18)+Math.max(0,600-inspected*20);update();runtime.later(finish,1500);
+      function loop(now){
+        if(!running)return;const dt=Math.min((now-last)/1000,.05);last=now;
+        if(!paused&&roundOverlay.hidden&&resultOverlay.hidden){
+          clock+=dt;elapsed+=dt;cooldown=Math.max(0,cooldown-dt);settle=Math.max(0,settle-dt);worker?.el.classList.toggle("snipping",settle>0);
+          if([0,1,3].includes(phase)){
+            let kx=0,ky=0;if(heldKeys.has("ArrowLeft")||heldKeys.has("a"))kx--;if(heldKeys.has("ArrowRight")||heldKeys.has("d"))kx++;if(heldKeys.has("ArrowUp")||heldKeys.has("w"))ky--;if(heldKeys.has("ArrowDown")||heldKeys.has("s"))ky++;
+            if(kx||ky)target={x:radar.x+kx*8,y:radar.y+ky*8};
+            walking=stepActor(radar,target,phase===3?18:24,dt);radar.el.classList.toggle("walking",walking);
+          }
+          if(phase===3){
+            const tail=trail[trail.length-1];if(!tail||dist(radar,tail)>1.5)trail.push({x:radar.x,y:radar.y});
+            const gap=dist(radar,worker);const waiting=gap>(leadWaiting?23:30);
+            if(waiting!==leadWaiting){leadWaiting=waiting;hint(waiting?"She lost sight of Radar! Go back closer to the rescue worker, then lead her onward.":"She can see Radar again. Lead her along the dirt trail to Beau.");}
+            if(!leadWaiting&&trail.length){const p=trail[0];if(dist(worker,p)<2)trail.shift();else if(gap>6)stepActor(worker,p,13,dt);}
+            meemaw.x=worker.x-5;meemaw.y=Math.min(84,worker.y+5);draw(meemaw);
+          }
+          if(phase===2||phase===4){meter=.5+Math.sin(clock*(phase===2?2.5:2.7+cuts*.28))*.47;needle.style.left=`${meter*100}%`;const half=phase===2?.18:.20-cuts*.025;meterWindow.style.left=`${(0.5-half)*100}%`;meterWindow.style.width=`${half*200}%`;}
+          if(phase===2&&barks===3&&cooldown===0)arrive();
+          if(phase===5){belle.x=Math.max(89,belle.x-dt*2);belle.y=Math.max(46,belle.y-dt*2);draw(belle);}
+          update();
+        }
+        runtime.frame(loop);
       }
-      function update(){const phaseNames=["Search","Plan","Rescue","Safe"];const step=phase===0?`${clues}/3 clues`:phase===1?`${decision}/3 choices`:phase===2?`${snag}/5 snags`:"Complete";setHud("Stage",`${Math.min(phase+1,3)}/3`,phaseNames[phase]||"Safe",step,"Calm",`${calm}%`);}
-      function finish(){if(!running)return;running=false;const stars=mistakes<=1?3:mistakes<=4?2:1;completeGame({score,stars,title:"RADAR FOUND HIM — BEAU IS SAFE!",line:`“Oh, thank goodness. And good boy, Radar.”<br><b>— Meemaw Grace</b><br><small>${mistakes===0?"A careful, perfect rescue.":`${mistakes} rescue misstep${mistakes===1?"":"s"}, but Beau made it safely back to Belle.`}</small>`});}
-      return{start,stop(){running=false;},destroy(){running=false;runtime.clear();}};
+      function update(){
+        const values=[`${clue}/3 clues`,"Find Meemaw",`${barks}/3 barks`,leadWaiting?"Come back!":"Stay together",`${cuts}/4 snips`,"Reunited"];
+        setHud("Rescue",`${phase<2?phase+1:phase===2?2:phase===3?3:4}/4`,"Goal",values[phase],"Score",score);
+        const labels=["Sniff the clue","Alert Meemaw",barks===3?"Calling wildlife rescue…":`Bark! (${barks}/3)`,"Show her Beau","Steady, Radar!","Celebrate the rescue"];
+        action.textContent=labels[phase];
+        action.disabled=cooldown>0||(phase===0&&dist(radar,clues[clue])>=7)||(phase===1&&dist(radar,home)>=10)||(phase===3&&(dist(radar,{x:76,y:48})>=10||dist(worker,goose)>=19));
+        if(phase===0&&action.disabled)action.textContent="Move Radar closer to sniff";
+        if(phase===1&&action.disabled)action.textContent="Return to Meemaw on the left";
+        if(phase===3&&action.disabled)action.textContent=leadWaiting?"Go back for the rescue worker":"Lead her to Beau’s paw marker";
+        if(phase===4&&cooldown>0)action.textContent="The rescuer is settling Beau…";
+      }
+      function finish(){if(!running)return;running=false;score+=Math.max(0,1200-Math.floor(elapsed)*5);const stars=errors<=2?3:errors<=6?2:1;
+        completeGame({score,stars,title:"A GOOD DOG. A GOOSE SAVED.",line:`Radar found Beau, fetched Meemaw, and led the wildlife rescuer to the pond bank.<br><b>Beau and Belle are together again!</b><br><small>${errors} misstep${errors===1?"":"s"} · ${Math.round(elapsed)} seconds · ${stars===3?"Excellent rescue teamwork!":"Try again for a smoother rescue."}</small>`});}
+      return{start,stop(){running=false;},destroy(){running=false;runtime.clear();world.classList.remove("pond-world");delete world.dataset.rescuePhase;stage.classList.remove("pond-stage");}};
     },
 
     snailmail() {
@@ -821,5 +861,5 @@
   });
 
   renderArcade();
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=9").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=10").catch(()=>{}));
 })();

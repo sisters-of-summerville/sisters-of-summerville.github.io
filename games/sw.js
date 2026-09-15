@@ -1,11 +1,11 @@
-const CACHE = "sisters-chaos-arcade-v9";
+const CACHE = "sisters-chaos-arcade-v10";
 const ASSETS = [
-  "./", "index.html", "styles.css?v=9", "game.js?v=9", "manifest.webmanifest",
+  "./", "index.html", "styles.css?v=10", "game.js?v=10", "manifest.webmanifest",
   "assets/living-room.webp", "assets/backyard.webp", "assets/acorn-green.webp", "assets/bootsie-search-room.webp",
   "assets/honey-roomba.webp", "assets/bootsie.webp", "assets/nimble-nut.webp",
   "assets/nimble-nut-squashed.webp", "assets/maggie-jean.webp", "assets/caddy-hack.webp",
   "assets/icon-192.png", "assets/icon-512.png",
-  "assets/radar.png", "assets/meemaw.png", "assets/beau.png", "assets/belle.png"
+  "assets/pond-rescue.png", "assets/pond-props.png", "assets/wildlife-rescuer.png", "assets/radar.png", "assets/meemaw.png", "assets/beau.png", "assets/belle.png"
 ];
 
 self.addEventListener("install", event => {
