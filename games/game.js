@@ -699,20 +699,20 @@
         heading=$("pondHeading");message=$("pondMessage");
         rocks.forEach(r=>{const rock=create("div","pond-rock pond-prop prop-rock");place(rock,r.x,r.y,Math.round(r.y));});
         marker=create("div","pond-destination");marker.innerHTML='<span class="pond-prop prop-paws"></span>';marker.setAttribute("aria-hidden","true");
-        meemaw=actor("meemaw.png","Meemaw",home.x,home.y,"pond-meemaw");
+        meemaw=actor("meemaw.png","Meemaw",home.x,home.y,"pond-meemaw pond-facing-opposite");
         beau=actor("beau.png","Beau",goose.x,goose.y,"pond-goose tangled");beau.el.hidden=true;
         belle=actor("belle.png","Belle",91,51,"pond-goose");belle.el.hidden=true;
-        radar=actor("radar.png","Radar",18,82,"pond-radar");
+        radar=actor("radar.png","Radar",18,82,"pond-radar pond-facing-opposite");
         const controls=create("div","pond-controls");
         meterBox=create("div","pond-meter-box",controls);meterBox.innerHTML='<small id="pondMeterLabel">Tap when the marker reaches the gold zone</small><div class="pond-meter"><i class="pond-meter-window"></i><b class="pond-meter-needle"></b></div>';meterBox.hidden=true;
         needle=meterBox.querySelector(".pond-meter-needle");meterWindow=meterBox.querySelector(".pond-meter-window");
         action=create("button","pond-action",controls);action.type="button";runtime.on(action,"click",interact);
-        const help=create("span","pond-control-help",controls);help.textContent="Tap the trail or drag to move · Arrow keys / WASD · Enter to act";
+        const help=create("span","pond-control-help",controls);help.textContent="Tap the trail or drag to move · Arrow keys / WASD · Timed taps stay at the bottom";
         runtime.on(stage,"pointerdown",e=>{if(!running||paused||e.target.closest("button,.overlay,.pond-controls,.pond-brief"))return;pressing=true;moveTarget(e);stage.setPointerCapture?.(e.pointerId);});
         runtime.on(stage,"pointermove",e=>{if(pressing&&!paused)moveTarget(e);});
         runtime.on(stage,"pointerup",()=>{pressing=false;});runtime.on(stage,"pointercancel",()=>{pressing=false;});
         runtime.on(window,"keydown",e=>{if(e.key==="Enter"&&!e.repeat&&document.activeElement!==action)interact();});
-        setPhase(0,"Steer Radar to the feather on the dirt trail. Get close, then tap Sniff.");showClue();last=performance.now();runtime.frame(loop);
+        setPhase(0,"Steer Radar to the feather on the dirt trail. The clue triggers when he reaches it.");showClue();last=performance.now();runtime.frame(loop);
       }
       function moveTarget(e){if(![0,1,3].includes(phase))return;const p=eventPoint(e);target={x:Math.max(8,Math.min(92,p.x)),y:Math.max(39,Math.min(84,p.y))};}
       function showClue(){
@@ -750,8 +750,14 @@
         }else if(phase===5){finish();}
         update();
       }
+      function checkArrival(){
+        if(cooldown>0)return;
+        if(phase===0&&dist(radar,clues[clue])<7)interact();
+        else if(phase===1&&dist(radar,home)<10)interact();
+        else if(phase===3&&dist(radar,{x:76,y:48})<10&&dist(worker,goose)<19)interact();
+      }
       function arrive(){
-        worker=actor("wildlife-rescuer.png","Wildlife rescue",15,81,"pond-worker");
+        worker=actor("wildlife-rescuer.png","Wildlife rescue",15,81,"pond-worker pond-facing-opposite");
         trail=[{x:radar.x,y:radar.y}];setPhase(3,"The rescue worker has arrived! Lead her to Beau’s paw marker. If you run too far ahead, return to her so she can follow.");
       }
       function loop(now){
@@ -770,6 +776,7 @@
             if(!leadWaiting&&trail.length){const p=trail[0];if(dist(worker,p)<2)trail.shift();else if(gap>6)stepActor(worker,p,13,dt);}
             meemaw.x=worker.x-5;meemaw.y=Math.min(84,worker.y+5);draw(meemaw);
           }
+          if([0,1,3].includes(phase))checkArrival();
           if(phase===2||phase===4){meter=.5+Math.sin(clock*(phase===2?2.5:2.7+cuts*.28))*.47;needle.style.left=`${meter*100}%`;const half=phase===2?.18:.20-cuts*.025;meterWindow.style.left=`${(0.5-half)*100}%`;meterWindow.style.width=`${half*200}%`;}
           if(phase===2&&barks===3&&cooldown===0)arrive();
           if(phase===5){belle.x=Math.max(89,belle.x-dt*2);belle.y=Math.max(46,belle.y-dt*2);draw(belle);}
@@ -782,6 +789,7 @@
         setHud("Rescue",`${phase<2?phase+1:phase===2?2:phase===3?3:4}/4`,"Goal",values[phase],"Score",score);
         const labels=["Sniff the clue","Alert Meemaw",barks===3?"Calling wildlife rescue…":`Bark! (${barks}/3)`,"Show her Beau","Steady, Radar!","Celebrate the rescue"];
         action.textContent=labels[phase];
+        action.hidden=phase===0||phase===1||phase===3;
         action.disabled=cooldown>0||(phase===0&&dist(radar,clues[clue])>=7)||(phase===1&&dist(radar,home)>=10)||(phase===3&&(dist(radar,{x:76,y:48})>=10||dist(worker,goose)>=19));
         if(phase===0&&action.disabled)action.textContent="Move Radar closer to sniff";
         if(phase===1&&action.disabled)action.textContent="Return to Meemaw on the left";
@@ -861,5 +869,5 @@
   });
 
   renderArcade();
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=10").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=11").catch(()=>{}));
 })();
