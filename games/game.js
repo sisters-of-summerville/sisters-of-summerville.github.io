@@ -561,9 +561,9 @@
     acorn() {
       const runtime=makeRuntime();
       const greens=[
-        {name:"Picnic Green",start:{x:24,y:72},cup:{x:75,y:23},par:3},
+        {name:"Picnic Green",start:{x:36,y:70},cup:{x:75,y:23},par:3},
         {name:"Azalea Green",start:{x:49,y:76},cup:{x:75,y:23},par:3},
-        {name:"Champion Green",start:{x:20,y:48},cup:{x:75,y:23},par:4}
+        {name:"Champion Green",start:{x:28,y:50},cup:{x:75,y:23},par:4}
       ];
       const aceLines={
         opening:[
@@ -607,7 +607,7 @@
           "In the cup! I never doubted me for a second."
         ]
       };
-      let hole=0,strokes=0,holeStrokes=0,score=0,running=false,ball=null,ballEl=null,cupEl=null,aimEl=null,targetEl=null,aiming=false,moving=false,raf=null,last=0,inSand=false,aimPower=0,lastAceTalk=0;
+      let hole=0,strokes=0,holeStrokes=0,score=0,running=false,ball=null,ballEl=null,cupEl=null,aimEl=null,targetEl=null,aiming=false,moving=false,raf=null,last=0,inSand=false,aimPower=0,lastAceTalk=0,lastGalleryBump=0;
       const pick=(lines)=>lines[Math.floor(Math.random()*lines.length)];
       function aceTalk(line,force=false){const now=performance.now();if(!force&&now-lastAceTalk<1000)return;lastAceTalk=now;addCoach(line,"assets/ace-forgetful.webp","Ace the Forgetful Golfer");}
       function start(){
@@ -620,7 +620,7 @@
         world.querySelectorAll(".golf-ball,.golf-hole,.power-readout,.aim-line,.aim-target,.green-label").forEach(el=>el.remove());
         ball={...greens[hole].start,vx:0,vy:0};holeStrokes=0;moving=false;aiming=false;inSand=false;aimPower=0;
         cupEl=create("div","golf-hole");place(cupEl,greens[hole].cup.x,greens[hole].cup.y,20);cupEl.setAttribute("aria-label","The cup on this green");
-        ballEl=create("button","golf-ball");ballEl.type="button";ballEl.textContent="🌰";ballEl.setAttribute("aria-label","Acorn ball. Touch and drag toward your target.");place(ballEl,ball.x,ball.y,46);
+        ballEl=create("button","golf-ball");ballEl.type="button";ballEl.textContent="🌰";ballEl.setAttribute("aria-label","Acorn ball. Touch and drag toward your target.");place(ballEl,ball.x,ball.y,78);
         const label=create("div","green-label");label.textContent=`Green ${hole+1}/3 · ${greens[hole].name} · Par ${greens[hole].par}`;
         const power=create("div","power-readout");power.id="powerReadout";power.innerHTML='<b>Touch the acorn to aim</b><span class="power-track"><i id="puttPower"></i><em class="power-third short">SHORT</em><em class="power-third medium">MED</em><em class="power-third long">LONG</em></span><small>Drag the target where you want the acorn to go, then release</small>';
         update();last=performance.now();aceTalk(pick(aceLines.opening),true);
@@ -645,10 +645,16 @@
         const cx=50,cy=51,rx=45,ry=38,nx=(ball.x-cx)/rx,ny=(ball.y-cy)/ry,d=Math.hypot(nx,ny);
         if(d<=1)return;ball.x=cx+nx/d*rx*.985;ball.y=cy+ny/d*ry*.985;ball.vx*=-.22;ball.vy*=-.22;popText(ball.x,ball.y,"FRINGE!");aceTalk(pick(aceLines.fringe));
       }
+      function keepClearOfCharacters(now){
+        let label="";
+        if(ball.x<31&&ball.y>68){ball.x=31;ball.vx=Math.max(.12,Math.abs(ball.vx)*.38);ball.vy*=.68;label="ACE'S CORNER!";}
+        else if(ball.x>79&&ball.y>74){ball.x=79;ball.vx=-Math.max(.12,Math.abs(ball.vx)*.38);ball.vy*=.68;label="CADDY'S CORNER!";}
+        if(label&&now-lastGalleryBump>850){lastGalleryBump=now;popText(ball.x,ball.y,label);beep(155,.055,"square",.025);aceTalk("Easy there! The gallery is part of the course. I think.");}
+      }
       function loop(now){
         if(!running)return;const dt=Math.min((now-last)/16.667,2);last=now;
         if(!paused&&moving){
-          ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;keepOnGreen();inSand=isSand(ball);const friction=inSand ? .82 : .968;ball.vx*=Math.pow(friction,dt);ball.vy*=Math.pow(friction,dt);place(ballEl,ball.x,ball.y,46);
+          ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;keepOnGreen();keepClearOfCharacters(now);inSand=isSand(ball);const friction=inSand ? .82 : .968;ball.vx*=Math.pow(friction,dt);ball.vy*=Math.pow(friction,dt);place(ballEl,ball.x,ball.y,78);
           const speed=Math.hypot(ball.vx,ball.vy);if(distance(ball,greens[hole].cup)<4.2&&speed<1.1)sink();else if(speed<.035){moving=false;ball.vx=ball.vy=0;ballEl.classList.remove("moving");resetReadout();if(inSand){popText(ball.x,ball.y,"STUCK IN SAND!");aceTalk(pick(aceLines.sand),true);}else aceTalk(pick(aceLines.stopped),true);}
         }
         raf=runtime.frame(loop);
@@ -946,5 +952,5 @@
   renderArcade();
   const requestedGame = new URLSearchParams(window.location.search).get("game");
   if (requestedGame && !openGame(requestedGame,false)) setGameUrl(null);
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=15").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=16").catch(()=>{}));
 })();

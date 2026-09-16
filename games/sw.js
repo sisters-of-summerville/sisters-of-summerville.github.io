@@ -1,6 +1,6 @@
-const CACHE = "sisters-chaos-arcade-v15";
+const CACHE = "sisters-chaos-arcade-v16";
 const ASSETS = [
-  "./", "index.html", "styles.css?v=15", "game.js?v=15", "manifest.webmanifest",
+  "./", "index.html", "styles.css?v=16", "game.js?v=16", "manifest.webmanifest",
   "assets/living-room.webp", "assets/backyard.webp", "assets/acorn-green.webp", "assets/bootsie-search-room.webp",
   "assets/honey-roomba.webp", "assets/bootsie.webp", "assets/nimble-nut.webp",
   "assets/nimble-nut-squashed.webp", "assets/maggie-jean.webp", "assets/caddy-hack.webp", "assets/ace-forgetful.webp",
