@@ -43,10 +43,10 @@
     },
     {
       id: "acorn", title: "The Acorn Open", kicker: "Three-Green Challenge",
-      description: "Putt acorns past water and sand while Caddy Hack provides highly questionable advice.",
-      background: "assets/acorn-green.webp", character: "assets/caddy-hack.webp",
-      instructions: "Touch the acorn and drag the aiming arrow exactly where you want the shot to travel. The moving target marker shows direction while the distance meter gives SHORT, MEDIUM or LONG power before you release.",
-      rewards: ["Live aiming reticle", "Short / medium / long distance control", "Punishing sand traps"], button: "Tee Off"
+      description: "Putt acorns past water and sand while Ace heckles every shot with absolute, frequently misplaced confidence.",
+      background: "assets/acorn-green.webp", character: "assets/ace-forgetful.webp",
+      instructions: "Touch the acorn and drag the aiming arrow exactly where you want the shot to travel. The moving target marker shows direction while the distance meter gives SHORT, MEDIUM or LONG power before you release. Ace will offer commentary. Whether any of it is useful is another matter.",
+      rewards: ["Reactive Ace commentary", "Short / medium / long distance control", "Punishing sand traps"], button: "Tee Off with Ace"
     },
     {
       id: "paworder", title: "Paw & Order", kicker: "Cushion Crimes Unit",
@@ -552,10 +552,53 @@
         {name:"Azalea Green",start:{x:49,y:76},cup:{x:75,y:23},par:3},
         {name:"Champion Green",start:{x:20,y:48},cup:{x:75,y:23},par:4}
       ];
-      let hole=0,strokes=0,holeStrokes=0,score=0,running=false,ball=null,ballEl=null,cupEl=null,aimEl=null,targetEl=null,aiming=false,moving=false,raf=null,last=0,inSand=false,aimPower=0;
+      const aceLines={
+        opening:[
+          "A fresh green! Or a very tidy lawn. Either way, I own it.",
+          "The cup is exactly where I expected it—once you point it out.",
+          "I remember this hole perfectly. I just don't recall playing it."
+        ],
+        short:[
+          "A cautious tap! Bold strategy for someone afraid of distance.",
+          "That acorn moved. I saw it with my own two… never mind.",
+          "A little farther next time. Unless the cup comes to us."
+        ],
+        medium:[
+          "Not bad. I'd have hit it straighter, naturally. Which way is straight?",
+          "Good swing! Almost exactly like the one I meant to suggest.",
+          "Confident contact. Accuracy is mostly paperwork."
+        ],
+        long:[
+          "Now THAT is confidence! Accuracy can catch up later.",
+          "Give it everything! The next green might count too.",
+          "Magnificent! I heard the acorn leave, so it must be good."
+        ],
+        sand:[
+          "Excellent—straight into the beach. Sand builds character.",
+          "Right where I wanted it. The cup can come to us.",
+          "I call that a tactical rest in the sand."
+        ],
+        fringe:[
+          "Perfectly played. I always take the scenic route.",
+          "The green moved! I suspected as much.",
+          "A boundary is merely the course admitting defeat."
+        ],
+        stopped:[
+          "It stopped to admire my advice.",
+          "Close! To something, certainly.",
+          "Fine position. I can almost remember what for."
+        ],
+        sunk:[
+          "You're welcome! I knew my coaching would reach you eventually.",
+          "Just as I planned. You performed it surprisingly well.",
+          "In the cup! I never doubted me for a second."
+        ]
+      };
+      let hole=0,strokes=0,holeStrokes=0,score=0,running=false,ball=null,ballEl=null,cupEl=null,aimEl=null,targetEl=null,aiming=false,moving=false,raf=null,last=0,inSand=false,aimPower=0,lastAceTalk=0;
+      const pick=(lines)=>lines[Math.floor(Math.random()*lines.length)];
+      function aceTalk(line,force=false){const now=performance.now();if(!force&&now-lastAceTalk<1000)return;lastAceTalk=now;addCoach(line,"assets/ace-forgetful.webp","Ace the Forgetful Golfer");}
       function start(){
         world.innerHTML="";running=true;backgroundLayer.style.backgroundImage='url("assets/acorn-green.webp")';
-        const caddy=create("img","course-character");caddy.src="assets/caddy-hack.webp";caddy.alt="Caddy Hack";
         runtime.on(stage,"pointerdown",down);runtime.on(stage,"pointermove",move);runtime.on(stage,"pointerup",up);runtime.on(stage,"pointercancel",up);startHole();last=performance.now();raf=runtime.frame(loop);
       }
       function startHole(){
@@ -565,7 +608,7 @@
         ballEl=create("button","golf-ball");ballEl.type="button";ballEl.textContent="🌰";ballEl.setAttribute("aria-label","Acorn ball. Touch and drag toward your target.");place(ballEl,ball.x,ball.y,46);
         const label=create("div","green-label");label.textContent=`Green ${hole+1}/3 · ${greens[hole].name} · Par ${greens[hole].par}`;
         const power=create("div","power-readout");power.id="powerReadout";power.innerHTML='<b>Touch the acorn to aim</b><span class="power-track"><i id="puttPower"></i><em class="power-third short">SHORT</em><em class="power-third medium">MED</em><em class="power-third long">LONG</em></span><small>Drag the target where you want the acorn to go, then release</small>';
-        update();last=performance.now();
+        update();last=performance.now();aceTalk(pick(aceLines.opening),true);
       }
       function down(event){if(paused||moving||!running)return;const p=eventPoint(event);if(distance(p,ball)<14){aiming=true;stage.setPointerCapture?.(event.pointerId);setAim(p);}}
       function move(event){if(aiming&&!paused)setAim(eventPoint(event));}
@@ -580,25 +623,25 @@
       }
       function up(event){
         if(!aiming||paused)return;aiming=false;const p=eventPoint(event),dx=p.x-ball.x,dy=p.y-ball.y,raw=Math.hypot(dx,dy),len=Math.min(38,raw);aimEl?.remove();targetEl?.remove();aimEl=null;targetEl=null;
-        if(len<3){resetReadout();return;}const sandShot=isSand(ball),power=Math.min(2.95,len*.078)*(sandShot ? .48 : 1);ball.vx=dx/Math.max(raw,.01)*power;ball.vy=dy/Math.max(raw,.01)*power;moving=true;strokes++;holeStrokes++;ballEl.classList.add("moving");if(sandShot)popText(ball.x,ball.y,"DIG IT OUT!");beep(185,.06,"square",.04);update();
+        if(len<3){resetReadout();return;}const sandShot=isSand(ball),power=Math.min(2.95,len*.078)*(sandShot ? .48 : 1);ball.vx=dx/Math.max(raw,.01)*power;ball.vy=dy/Math.max(raw,.01)*power;moving=true;strokes++;holeStrokes++;ballEl.classList.add("moving");if(sandShot){popText(ball.x,ball.y,"DIG IT OUT!");aceTalk(pick(aceLines.sand),true);}else aceTalk(pick(aimPower<34?aceLines.short:aimPower<68?aceLines.medium:aceLines.long),true);beep(185,.06,"square",.04);update();
       }
       function isSand(p){return p.x>82&&p.y>39&&p.y<76;}
       function keepOnGreen(){
         const cx=50,cy=51,rx=45,ry=38,nx=(ball.x-cx)/rx,ny=(ball.y-cy)/ry,d=Math.hypot(nx,ny);
-        if(d<=1)return;ball.x=cx+nx/d*rx*.985;ball.y=cy+ny/d*ry*.985;ball.vx*=-.22;ball.vy*=-.22;popText(ball.x,ball.y,"FRINGE!");
+        if(d<=1)return;ball.x=cx+nx/d*rx*.985;ball.y=cy+ny/d*ry*.985;ball.vx*=-.22;ball.vy*=-.22;popText(ball.x,ball.y,"FRINGE!");aceTalk(pick(aceLines.fringe));
       }
       function loop(now){
         if(!running)return;const dt=Math.min((now-last)/16.667,2);last=now;
         if(!paused&&moving){
           ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;keepOnGreen();inSand=isSand(ball);const friction=inSand ? .82 : .968;ball.vx*=Math.pow(friction,dt);ball.vy*=Math.pow(friction,dt);place(ballEl,ball.x,ball.y,46);
-          const speed=Math.hypot(ball.vx,ball.vy);if(distance(ball,greens[hole].cup)<4.2&&speed<1.1)sink();else if(speed<.035){moving=false;ball.vx=ball.vy=0;ballEl.classList.remove("moving");resetReadout();if(inSand)popText(ball.x,ball.y,"STUCK IN SAND!");}
+          const speed=Math.hypot(ball.vx,ball.vy);if(distance(ball,greens[hole].cup)<4.2&&speed<1.1)sink();else if(speed<.035){moving=false;ball.vx=ball.vy=0;ballEl.classList.remove("moving");resetReadout();if(inSand){popText(ball.x,ball.y,"STUCK IN SAND!");aceTalk(pick(aceLines.sand),true);}else aceTalk(pick(aceLines.stopped),true);}
         }
         raf=runtime.frame(loop);
       }
       function resetReadout(){const r=$("powerReadout");if(r){r.querySelector("b").textContent=inSand?"Sand shot — use LONG power":"Touch the acorn to aim";const bar=$("puttPower");if(bar)bar.style.transform="scaleX(0)";}}
-      function sink(){moving=false;ballEl.classList.add("collected");score+=Math.max(350,1800-holeStrokes*185);popText(ball.x,ball.y,holeStrokes<=greens[hole].par?"UNDER PAR!":"IN THE CUP!");beep(720,.12,"sine",.04);runtime.later(()=>{hole++;if(hole<greens.length){showRound(`Green ${hole} Complete`,`${holeStrokes} Strokes`,`Next is ${greens[hole].name}, par ${greens[hole].par}. Aim with the target reticle and choose your distance before releasing.`,`Play Green ${hole+1}`,()=>{roundOverlay.hidden=true;startHole();});}else finish();},650);}
+      function sink(){moving=false;ballEl.classList.add("collected");score+=Math.max(350,1800-holeStrokes*185);popText(ball.x,ball.y,holeStrokes<=greens[hole].par?"UNDER PAR!":"IN THE CUP!");aceTalk(pick(aceLines.sunk),true);beep(720,.12,"sine",.04);runtime.later(()=>{hole++;if(hole<greens.length){showRound(`Green ${hole} Complete`,`${holeStrokes} Strokes`,`Next is ${greens[hole].name}, par ${greens[hole].par}. Ace claims he remembers this one. He does not.`,`Play Green ${hole+1}`,()=>{roundOverlay.hidden=true;startHole();});}else finish();},650);}
       function update(){setHud("Green",`${hole+1}/3`,"Strokes",strokes,"Par",greens[hole]?.par||"—");}
-      function finish(){running=false;score+=Math.max(0,3600-strokes*190);const stars=strokes<=9?3:strokes<=13?2:1;completeGame({score,stars,title:strokes<=9?"Squirrel Tour Qualified!":"Acorn Open Complete!",line:`“${strokes} strokes, three greens, and exactly three cups total. Finally.”<br><b>— Bootsie Belle</b>`});}
+      function finish(){running=false;score+=Math.max(0,3600-strokes*190);const stars=strokes<=9?3:strokes<=13?2:1;completeGame({score,stars,title:strokes<=9?"Squirrel Tour Qualified!":"Acorn Open Complete!",line:`“${strokes} strokes? That's exactly what I wrote down. Somewhere.”<br><b>— Ace the Forgetful Golfer</b>`});}
       return{start,stop(){running=false;},destroy(){running=false;runtime.clear();}};
     },
 

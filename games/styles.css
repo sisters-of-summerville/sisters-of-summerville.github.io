@@ -119,6 +119,7 @@ body.game-fullscreen .arcade-frame{width:100vw;height:var(--arcade-vh);max-width
 
 .coach{position:absolute;right:1.3%;bottom:1%;z-index:74;width:clamp(105px,15vw,205px);pointer-events:none}
 .coach img{display:block;width:80%;margin-left:auto;filter:drop-shadow(0 10px 6px #35160c77)}
+.coach img[src$="ace-forgetful.webp"]{width:72%;max-height:38vh;object-fit:contain;object-position:bottom right}
 .speech-bubble{position:relative;margin-right:9%;padding:9px 10px;border:3px solid var(--ink);border-radius:50%;color:var(--ink);background:#fffdf4;font-size:clamp(.68rem,1.55vw,1rem);font-weight:1000;line-height:1.08;text-align:center;box-shadow:3px 4px 0 #34150d55;transform:rotate(-2deg)}
 .speech-bubble::after{content:"";position:absolute;right:21%;bottom:-12px;width:17px;height:17px;background:#fffdf4;border-right:3px solid var(--ink);border-bottom:3px solid var(--ink);transform:rotate(42deg)}
 
