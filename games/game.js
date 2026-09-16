@@ -132,11 +132,20 @@
     });
   }
 
-  function openGame(id) {
+  function setGameUrl(id) {
+    const url = new URL(window.location.href);
+    if (id) url.searchParams.set("game", id);
+    else url.searchParams.delete("game");
+    window.history.replaceState({ game: id || null }, "", `${url.pathname}${url.search}${url.hash}`);
+  }
+
+  function openGame(id, updateUrl = true) {
+    const game = games.find((item) => item.id === id);
+    if (!game) return false;
     cleanupGame();
     document.body.classList.add("game-setup");
     currentId = id;
-    const game = games.find((item) => item.id === id);
+    if (updateUrl) setGameUrl(id);
     arcadeScreen.hidden = true;
     playScreen.hidden = false;
     $("gameTitle").textContent = game.title;
@@ -158,6 +167,7 @@
     coach.hidden = true;
     world.innerHTML = "";
     setHud("Ready", "—", "Best", progress.games[id]?.best || 0, "Stars", `${progress.games[id]?.stars || 0}/3`);
+    return true;
   }
 
   function enterGameFullscreen() {
@@ -212,9 +222,11 @@
     document.querySelectorAll(".comic-pop,.combo-banner,.path-warning").forEach((el) => el.remove());
   }
 
-  function showArcade() {
+  function showArcade(updateUrl = true) {
     leaveGameFullscreen();
     cleanupGame();
+    currentId = null;
+    if (updateUrl) setGameUrl(null);
     playScreen.hidden = true;
     arcadeScreen.hidden = false;
     renderArcade();
@@ -925,6 +937,14 @@
     setTimeout(()=>{if(Date.now()>=ignoreVisibilityPauseUntil&&document.hidden&&currentModule&&!paused&&resultOverlay.hidden&&roundOverlay.hidden&&instructionOverlay.hidden)togglePause(true);},250);
   });
 
+  window.addEventListener("popstate",()=>{
+    const requested = new URLSearchParams(window.location.search).get("game");
+    if (requested && games.some((game)=>game.id===requested)) openGame(requested,false);
+    else showArcade(false);
+  });
+
   renderArcade();
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=12").catch(()=>{}));
+  const requestedGame = new URLSearchParams(window.location.search).get("game");
+  if (requestedGame && !openGame(requestedGame,false)) setGameUrl(null);
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=15").catch(()=>{}));
 })();
