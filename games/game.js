@@ -207,6 +207,7 @@
     roundAction = null;
     world.innerHTML = "";
     coach.hidden = true;
+    coach.classList.remove("ace-golf-coach");
     document.body.classList.remove("game-setup");
     document.querySelectorAll(".comic-pop,.combo-banner,.path-warning").forEach((el) => el.remove());
   }
@@ -599,6 +600,8 @@
       function aceTalk(line,force=false){const now=performance.now();if(!force&&now-lastAceTalk<1000)return;lastAceTalk=now;addCoach(line,"assets/ace-forgetful.webp","Ace the Forgetful Golfer");}
       function start(){
         world.innerHTML="";running=true;backgroundLayer.style.backgroundImage='url("assets/acorn-green.webp")';
+        coach.classList.add("ace-golf-coach");
+        const caddy=create("img","course-character caddy-hack-character");caddy.src="assets/caddy-hack.webp";caddy.alt="Caddy Hack the gofer";
         runtime.on(stage,"pointerdown",down);runtime.on(stage,"pointermove",move);runtime.on(stage,"pointerup",up);runtime.on(stage,"pointercancel",up);startHole();last=performance.now();raf=runtime.frame(loop);
       }
       function startHole(){
@@ -642,7 +645,7 @@
       function sink(){moving=false;ballEl.classList.add("collected");score+=Math.max(350,1800-holeStrokes*185);popText(ball.x,ball.y,holeStrokes<=greens[hole].par?"UNDER PAR!":"IN THE CUP!");aceTalk(pick(aceLines.sunk),true);beep(720,.12,"sine",.04);runtime.later(()=>{hole++;if(hole<greens.length){showRound(`Green ${hole} Complete`,`${holeStrokes} Strokes`,`Next is ${greens[hole].name}, par ${greens[hole].par}. Ace claims he remembers this one. He does not.`,`Play Green ${hole+1}`,()=>{roundOverlay.hidden=true;startHole();});}else finish();},650);}
       function update(){setHud("Green",`${hole+1}/3`,"Strokes",strokes,"Par",greens[hole]?.par||"—");}
       function finish(){running=false;score+=Math.max(0,3600-strokes*190);const stars=strokes<=9?3:strokes<=13?2:1;completeGame({score,stars,title:strokes<=9?"Squirrel Tour Qualified!":"Acorn Open Complete!",line:`“${strokes} strokes? That's exactly what I wrote down. Somewhere.”<br><b>— Ace the Forgetful Golfer</b>`});}
-      return{start,stop(){running=false;},destroy(){running=false;runtime.clear();}};
+      return{start,stop(){running=false;},destroy(){running=false;coach.classList.remove("ace-golf-coach");runtime.clear();}};
     },
 
     paworder() {
