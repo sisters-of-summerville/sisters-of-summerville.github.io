@@ -561,7 +561,7 @@
     acorn() {
       const runtime=makeRuntime();
       const greens=[
-        {name:"Picnic Green",start:{x:36,y:70},cup:{x:75,y:23},par:3},
+        {name:"Picnic Green",start:{x:40,y:70},cup:{x:75,y:23},par:3},
         {name:"Azalea Green",start:{x:49,y:76},cup:{x:75,y:23},par:3},
         {name:"Champion Green",start:{x:28,y:50},cup:{x:75,y:23},par:4}
       ];
@@ -647,7 +647,7 @@
       }
       function keepClearOfCharacters(now){
         let label="";
-        if(ball.x<31&&ball.y>68){ball.x=31;ball.vx=Math.max(.12,Math.abs(ball.vx)*.38);ball.vy*=.68;label="ACE'S CORNER!";}
+        if(ball.x<36&&ball.y>56){ball.x=36;ball.vx=Math.max(.12,Math.abs(ball.vx)*.38);ball.vy*=.68;label="ACE'S CORNER!";}
         else if(ball.x>79&&ball.y>74){ball.x=79;ball.vx=-Math.max(.12,Math.abs(ball.vx)*.38);ball.vy*=.68;label="CADDY'S CORNER!";}
         if(label&&now-lastGalleryBump>850){lastGalleryBump=now;popText(ball.x,ball.y,label);beep(155,.055,"square",.025);aceTalk("Easy there! The gallery is part of the course. I think.");}
       }
@@ -952,5 +952,5 @@
   renderArcade();
   const requestedGame = new URLSearchParams(window.location.search).get("game");
   if (requestedGame && !openGame(requestedGame,false)) setGameUrl(null);
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=16").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=17").catch(()=>{}));
 })();
