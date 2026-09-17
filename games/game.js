@@ -883,13 +883,15 @@
         {name:"Sprinkler Speedway",time:31,mail:6,turbos:3,hazards:2,blockers:1,max:1.10},
         {name:"Parcel Hyperdrive",time:29,mail:7,turbos:4,hazards:3,blockers:2,max:1.18}
       ];
-      const spots=[{x:16,y:30},{x:27,y:43},{x:39,y:56},{x:51,y:35},{x:61,y:65},{x:72,y:45},{x:82,y:70},{x:33,y:72},{x:47,y:77},{x:68,y:27},{x:84,y:38},{x:20,y:63},{x:56,y:52},{x:75,y:78},{x:43,y:27}];
+      const spots=[{x:16,y:30},{x:27,y:43},{x:39,y:56},{x:51,y:35},{x:61,y:65},{x:72,y:45},{x:82,y:70},{x:33,y:72},{x:47,y:77},{x:68,y:27},{x:84,y:38},{x:20,y:63},{x:56,y:52},{x:75,y:78},{x:43,y:27},{x:13,y:48},{x:89,y:57},{x:58,y:82},{x:31,y:22}];
       let level=0,running=false,time=0,score=0,player,mail=[],boosts=[],hazards=[],blockers=[],mailHit=0,chain=0,bestChain=0,turboUntil=0,last=0,totalHits=0;
       function start(){running=true;runtime.every(tick,1000);startLevel();}
       function startLevel(){
         world.innerHTML="";const cfg=levels[level];time=cfg.time;mailHit=0;chain=0;turboUntil=0;mail=[];boosts=[];hazards=[];blockers=[];
         player=movingCharacter(runtime,{image:"assets/maggie-jean.webp",className:"maggie-player turbo-maggie",x:10,y:82,speed:.34,maxSpeed:cfg.max,minX:6,maxX:94,minY:16,maxY:89});
+        const needed=cfg.mail+cfg.turbos+cfg.hazards+cfg.blockers;
         const chosen=shuffle(spots);let cursor=0;
+        if(chosen.length<needed){running=false;completeGame({score,stars:0,title:"Delivery Route Needs Repair",line:"Maggie Jean found more deliveries than route locations. Please restart the game."});return;}
         for(let i=0;i<cfg.mail;i++){const pos=chosen[cursor++];const el=create("div","mail-item turbo-mail");el.textContent=i%3===2?"📦":"✉️";place(el,pos.x,pos.y,34);mail.push({...pos,hit:false,el,parcel:i%3===2});}
         for(let i=0;i<cfg.turbos;i++){const pos=chosen[cursor++];const el=create("div","turbo-stamp");el.innerHTML="⚡<b>TURBO</b>";place(el,pos.x,pos.y,36);boosts.push({...pos,hit:false,el});}
         for(let i=0;i<cfg.hazards;i++){const pos=chosen[cursor++];const el=create("div","sprinkler turbo-hazard");el.textContent="💦";place(el,pos.x,pos.y,31);hazards.push({...pos,baseX:pos.x,phase:i*2.2,hitAt:0,el});}
@@ -952,5 +954,5 @@
   renderArcade();
   const requestedGame = new URLSearchParams(window.location.search).get("game");
   if (requestedGame && !openGame(requestedGame,false)) setGameUrl(null);
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=18").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=19").catch(()=>{}));
 })();
