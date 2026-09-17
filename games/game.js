@@ -250,7 +250,7 @@
     roundOverlay.hidden = false;
   }
 
-  function completeGame({ score, stars, title, kicker = "Game Complete", line, tickets }) {
+  function completeGame({ score, stars, title, kicker = "Game Complete", line, tickets, playAgainLabel = "Play Again", arcadeLabel = "Choose Another Game" }) {
     currentModule?.stop?.();
     const earnedStars = Math.max(0, Math.min(3, stars));
     const previous = progress.games[currentId] || { stars: 0, best: 0, plays: 0 };
@@ -269,6 +269,8 @@
     $("resultTickets").textContent = `+${reward} 🎟️`;
     $("resultBest").textContent = progress.games[currentId].best;
     $("resultLine").innerHTML = line;
+    $("playAgainButton").textContent = playAgainLabel;
+    $("resultArcadeButton").textContent = arcadeLabel;
     resultOverlay.hidden = false;
     announcement.textContent = `${title}. You earned ${earnedStars} stars and ${reward} Treat Tickets.`;
     winChime();
@@ -912,9 +914,9 @@
         }runtime.frame(loop);
       }
       function hit(h,label,penalty){h.hitAt=performance.now();totalHits++;chain=0;time=Math.max(0,time-penalty);score=Math.max(0,score-100);player.state.vx*=-1.8;player.state.vy*=-1.8;popText(h.x,h.y,label);beep(115,.12,"sawtooth",.04);update();}
-      function completeLevel(){const cfg=levels[level];score+=time*45+bestChain*90;const finished=level+1;level++;if(level>=levels.length){finish(true);return;}running=false;showRound(`Sprint ${finished} Delivered`,"Mailbox Slammed!",`Next: ${levels[level].name}. More mail, more TURBO stamps, and more things trying to ruin Maggie Jean's land-speed record.`,`Launch Sprint ${level+1}`,()=>{roundOverlay.hidden=true;running=true;startLevel();});}
+      function completeLevel(){if(!running)return;const cfg=levels[level];score+=time*45+bestChain*90;const finished=level+1;if(finished>=levels.length){finish(true);return;}level=finished;running=false;showRound(`Sprint ${finished} Delivered`,"Mailbox Slammed!",`Next: ${levels[level].name}. More mail, more TURBO stamps, and more things trying to ruin Maggie Jean's land-speed record.`,`Launch Sprint ${level+1}`,()=>{roundOverlay.hidden=true;running=true;startLevel();});}
       function update(){const need=levels[level]?.mail||0;const turbo=Math.max(0,Math.ceil((turboUntil-performance.now())/1000));setHud("Sprint",`${Math.min(level+1,3)}/3`,"Mail",`${mailHit}/${need}`,turbo>0?"TURBO":"Time",turbo>0?`${turbo}s`:time);}
-      function finish(won){if(!running)return;running=false;const stars=won?(totalHits===0&&bestChain>=5?3:totalHits<=3?2:1):(level>=1?1:0);completeGame({score,stars,title:won?"SNAIL MAIL WENT SUPERSONIC!":"Turbo Delivery Wipeout!",line:won?`“I have filed a formal complaint with the laws of physics.”<br><b>— Bootsie Belle</b>`:`“At least traditional snail mail has fewer sprinkler incidents.”<br><b>— Bootsie Belle</b>`});}
+      function finish(won){if(!running)return;running=false;const stars=won?(totalHits===0&&bestChain>=5?3:totalHits<=3?2:1):(level>=1?1:0);completeGame({score,stars,kicker:won?"Three Sprints Delivered":"Delivery Run Ended",title:won?"SNAIL MAIL WENT SUPERSONIC!":"Turbo Delivery Wipeout!",line:won?`“I have filed a formal complaint with the laws of physics.”<br><b>— Bootsie Belle</b><br><small>What would you like to play next?</small>`:`“At least traditional snail mail has fewer sprinkler incidents.”<br><b>— Bootsie Belle</b>`,playAgainLabel:"Play Snail Mail Again",arcadeLabel:"Play a Different Game"});}
       return{start,stop(){running=false;},destroy(){running=false;runtime.clear();}};
     }
   };
@@ -954,5 +956,5 @@
   renderArcade();
   const requestedGame = new URLSearchParams(window.location.search).get("game");
   if (requestedGame && !openGame(requestedGame,false)) setGameUrl(null);
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=19").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20").catch(()=>{}));
 })();
