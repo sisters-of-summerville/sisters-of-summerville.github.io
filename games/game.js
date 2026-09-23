@@ -77,11 +77,11 @@
       rewards: ["Turbo speed bursts", "Mail-chain multipliers", "Three escalating delivery sprints"], button: "ENGAGE TURBO"
     },
     {
-      id: "pixelpanic", title: "Pixel Sisters: Collect & Dash!", kicker: "Simple 8-Bit Challenge",
-      description: "Drag the Pixel Sisters around the yard, collect the good items, and stay away from the glitch blocks.",
+      id: "pixelpanic", title: "Portal Hop!", kicker: "Pixel Portal Adventure",
+      description: "Hop through glowing portals with eight familiar characters, dodge the moving glitch, and get everyone home.",
       background: "assets/pixel-summerville.png", character: "assets/pixel-sisters.png",
-      instructions: "Drag anywhere to move the character. Collect every good item and avoid the purple glitch blocks. Round 1: Honey collects bones. Round 2: Bootsie collects crowns. Round 3: both sisters collect hearts together. The round ends automatically when everything is collected.",
-      rewards: ["One simple control", "Clear collection goals", "Three quick rounds"], button: "START COLLECTING"
+      instructions: "Tap an OPEN portal to hop forward. The purple glitch slides across the next platform, so wait for a safe opening if you need to. Pick up star portals for bonus points and reach HOME. Meet eight characters along the way.",
+      rewards: ["Eight pixel characters", "Tap to hop through portals", "Watch the moving glitch"], button: "START PORTAL HOP"
     }
   ];
 
@@ -930,121 +930,74 @@
     pixelpanic() {
       const runtime=makeRuntime();
       const levels=[
-        {name:"Honey's Bone Run",time:42,goal:8,hazards:2,hero:"honey",icon:"🦴",item:"Bones"},
-        {name:"Bootsie's Crown Grab",time:40,goal:9,hazards:3,hero:"bootsie",icon:"♛",item:"Crowns"},
-        {name:"Sisters Together",time:44,goal:12,hazards:4,hero:"duo",icon:"♥",item:"Hearts"}
+        {name:"Honey Bear",sheet:"sisters",slot:0}, {name:"Bootsie Belle",sheet:"sisters",slot:1},
+        {name:"Spot",sheet:"friends-a",slot:0}, {name:"Hershey",sheet:"friends-a",slot:1},
+        {name:"Gumbo",sheet:"friends-a",slot:2}, {name:"Cap’n Oh Yeah",sheet:"friends-b",slot:0},
+        {name:"Tiffany",sheet:"friends-b",slot:1}, {name:"Radar",sheet:"friends-b",slot:2}
       ];
-      const spots=[
-        {x:14,y:32},{x:24,y:25},{x:35,y:34},{x:46,y:28},{x:58,y:34},{x:70,y:26},{x:84,y:33},
-        {x:18,y:49},{x:31,y:48},{x:43,y:53},{x:57,y:48},{x:69,y:55},{x:82,y:49},
-        {x:13,y:69},{x:25,y:73},{x:38,y:67},{x:50,y:77},{x:62,y:68},{x:75,y:75},{x:87,y:67},
-        {x:32,y:82},{x:67,y:83},{x:91,y:53}
-      ];
-      let level=0,running=false,finishing=false,time=0,score=0,playerState,playerEl,items=[],hazards=[];
-      let collected=0,totalHits=0,combo=0,bestCombo=0,lastPickup=0,last=0,mission;
-
+      const lanes=[22,50,78], rows=[78,66,54,42,30,18];
+      let level=0,hops=0,glitches=0,score=0,running=false,transiting=false,hero,heroName,portals=[],shutter,mission,now=0;
       function start(){
-        stage.classList.add("pixel-stage");world.classList.add("pixel-world");
-        runtime.on(stage,"pointerdown",pointerDown);
-        runtime.on(stage,"pointermove",pointerMove);
-        runtime.on(stage,"pointerup",pointerUp);
-        runtime.on(stage,"pointercancel",pointerUp);
-        runtime.every(tick,1000);
-        running=true;startLevel();
+        stage.classList.add("pixel-stage","portal-stage");world.classList.add("pixel-world","portal-world");
+        running=true;buildStage();runtime.frame(loop);
       }
-
-      function startLevel(){
-        world.innerHTML="";items=[];hazards=[];collected=0;combo=0;finishing=false;
-        const cfg=levels[level];time=cfg.time;
-        world.dataset.pixelLevel=String(level+1);
-        playerState={x:50,y:84,vx:0,vy:0,targetX:50,targetY:84,dragging:false};
-        playerEl=create("div",`pixel-hero pixel-${cfg.hero}`);
-        playerEl.setAttribute("aria-label",cfg.hero==="honey"?"Pixel Honey Bear":cfg.hero==="bootsie"?"Pixel Bootsie Belle":"Pixel Honey Bear and Pixel Bootsie Belle");
-        place(playerEl,playerState.x,playerState.y,65);
-
-        mission=create("div","pixel-mission");
-        const chosen=shuffle(spots);let cursor=0;
-        for(let i=0;i<cfg.goal;i++)addItem(chosen[cursor++],cfg);
-        for(let i=0;i<cfg.hazards;i++)addHazard(chosen[cursor++],i);
-        updateMission();last=performance.now();runtime.frame(loop);
-      }
-
-      function addItem(pos,cfg){
-        const el=create("div",`pixel-token ${cfg.hero}-token`);el.innerHTML=`<span>${cfg.icon}</span>`;
-        place(el,pos.x,pos.y,48);items.push({...pos,hit:false,el});
-      }
-
-      function addHazard(pos,index){
-        const el=create("div","pixel-glitch");el.innerHTML="<i></i><i></i><i></i>";place(el,pos.x,pos.y,58);
-        hazards.push({...pos,baseX:pos.x,baseY:pos.y,phase:index*1.9+level,hitAt:0,el});
-      }
-
-      function pointerDown(event){
-        if(paused||!running)return;
-        playerState.dragging=true;stage.setPointerCapture?.(event.pointerId);setTarget(event);
-      }
-      function pointerMove(event){if(playerState?.dragging&&!paused)setTarget(event);}
-      function pointerUp(){if(playerState)playerState.dragging=false;}
-      function setTarget(event){const point=eventPoint(event);playerState.targetX=point.x;playerState.targetY=point.y;}
-
-      function movePlayer(dt){
-        let keyX=0,keyY=0;if(heldKeys.has("ArrowLeft")||heldKeys.has("a"))keyX--;if(heldKeys.has("ArrowRight")||heldKeys.has("d"))keyX++;if(heldKeys.has("ArrowUp")||heldKeys.has("w"))keyY--;if(heldKeys.has("ArrowDown")||heldKeys.has("s"))keyY++;
-        let dx=0,dy=0;if(keyX||keyY){dx=keyX;dy=keyY;}else if(playerState.dragging){dx=playerState.targetX-playerState.x;dy=playerState.targetY-playerState.y;}
-        const length=Math.hypot(dx,dy);if(length>1){playerState.vx+=dx/length*.42*dt;playerState.vy+=dy/length*.42*dt;}
-        const max=1.3;const speed=Math.hypot(playerState.vx,playerState.vy);if(speed>max){playerState.vx=playerState.vx/speed*max;playerState.vy=playerState.vy/speed*max;}
-        playerState.x+=playerState.vx*dt;playerState.y+=playerState.vy*dt;playerState.vx*=Math.pow(.90,dt);playerState.vy*=Math.pow(.90,dt);
-        if(playerState.x<7||playerState.x>93)playerState.vx*=-.55;if(playerState.y<22||playerState.y>90)playerState.vy*=-.55;
-        playerState.x=Math.max(7,Math.min(93,playerState.x));playerState.y=Math.max(22,Math.min(90,playerState.y));
-        place(playerEl,playerState.x,playerState.y,65+Math.round(playerState.y));playerEl.style.setProperty("--tilt",`${Math.max(-6,Math.min(6,playerState.vx*5))}deg`);
-      }
-
-      function loop(now){
-        if(!running)return;const dt=Math.min((now-last)/16.667,2.2);last=now;
-        if(!paused&&roundOverlay.hidden&&resultOverlay.hidden){
-          movePlayer(dt);
-          hazards.forEach((hazard,index)=>{
-            hazard.x=hazard.baseX+Math.sin(now/(650-level*70)+hazard.phase)*(4+level*1.5);
-            hazard.y=hazard.baseY+Math.cos(now/(780-level*65)+hazard.phase)*(3+level);
-            place(hazard.el,hazard.x,hazard.y,58);
-            if(now-hazard.hitAt>1200&&distance(playerState,hazard)<7.5)hitHazard(hazard);
+      function buildStage(){
+        world.innerHTML="";portals=[];transiting=false;hops=0;
+        const cfg=levels[level];world.dataset.pixelLevel=String(Math.min(3,Math.ceil((level+1)/3)));
+        mission=create("div","pixel-mission portal-mission");
+        mission.innerHTML=`<span>STAGE ${level+1}/8 · PORTAL HOP</span><b>GET ${cfg.name.toUpperCase()} HOME!</b><small>Tap an OPEN portal on the next platform. Purple glitches block the way.</small>`;
+        const route=create("div","portal-route");
+        rows.forEach((y,index)=>{
+          const rung=create("div",index===rows.length-1?"portal-rung home-rung":"portal-rung");rung.style.top=`${y}%`;
+          const line=create("i","rung-line",rung);
+          if(index===rows.length-1){const home=create("span","portal-home",rung);home.textContent="⌂ HOME";}
+          else lanes.forEach((x,lane)=>{
+            const button=create("button","hop-gate",rung);button.type="button";button.dataset.lane=String(lane);button.setAttribute("aria-label",`Tap portal ${lane===50?"Center":lane<50?"Left":"Right"}`);
+            button.innerHTML=`<i></i><b>${lane===50?"CENTER":lane<50?"LEFT":"RIGHT"}</b><small>OPEN</small>`;
+            button.addEventListener("click",()=>hop(lane,button));portals.push({x:lane,el:button,row:index});
           });
-          items.forEach(item=>{if(!item.hit&&distance(playerState,item)<7)collectItem(item,now);});
-        }
-        runtime.frame(loop);
+        });
+        shutter=create("div","portal-glitch-shutter");shutter.innerHTML="<b>GLITCH</b>";world.appendChild(shutter);
+        hero=create("div",`portal-hero portal-sheet-${cfg.sheet} portal-slot-${cfg.slot}`);
+        hero.setAttribute("aria-label",`${cfg.name} pixel character`);hero.innerHTML="<i></i>";world.appendChild(hero);place(hero,50,rows[0],63);
+        updateHud();updateGates();
       }
-
-      function collectItem(item,now){
-        if(finishing)return;item.hit=true;item.el.classList.add("collected");collected++;combo=now-lastPickup<2500?combo+1:1;lastPickup=now;bestCombo=Math.max(bestCombo,combo);
-        const cfg=levels[level];score+=200+Math.min(combo,6)*50;popText(item.x,item.y,combo>=3?`${combo}× COMBO!`:`${cfg.item.slice(0,-1).toUpperCase()}!`);beep(620+combo*24,.055,"square",.03);updateMission();
-        if(collected===cfg.goal){finishing=true;showCombo(`${cfg.item} collected!`);runtime.later(completeLevel,500);}
+      function updateHud(){setHud("Character",`${level+1}/8`,"Hops",`${hops}/5`,"Glitches",glitches);}
+      function updateGates(){
+        const nextRow=hops+1,barX=50+30*Math.sin(now/740+level*.83+hops*.67);
+        portals.forEach((portal)=>{
+          const active=portal.row===hops;
+          const blocked=active&&Math.abs(portal.x-barX)<21;
+          portal.el.hidden=!active;portal.el.classList.toggle("blocked",blocked);portal.el.classList.toggle("star-gate",active&&portal.x===((level+hops)%2===0?22:78));
+          const status=portal.el.querySelector("small");if(status)status.textContent=blocked?"WAIT":"OPEN";
+          portal.el.disabled=!active||transiting;
+        });
+        shutter.style.left=`${barX}%`;shutter.style.top=`${rows[nextRow]}%`;
+        shutter.classList.toggle("shutter-home",nextRow===rows.length-1);
       }
-
-      function hitHazard(hazard){
-        hazard.hitAt=performance.now();totalHits++;combo=0;time=Math.max(0,time-3);score=Math.max(0,score-140);playerState.vx*=-2;playerState.vy*=-2;
-        hazard.el.classList.add("hit");runtime.later(()=>hazard.el.classList.remove("hit"),360);popText(hazard.x,hazard.y,"GLITCHED! −3");beep(95,.14,"sawtooth",.04);updateMission();
+      function hop(lane,button){
+        if(!running||paused||transiting||!roundOverlay.hidden||!resultOverlay.hidden)return;
+        const barX=50+30*Math.sin(now/740+level*.83+hops*.67);
+        if(Math.abs(lane-barX)<21){glitches++;score=Math.max(0,score-100);button.classList.add("zapped");popText(lane,rows[hops],"ZAP! WAIT FOR OPEN");beep(130,.11,"square",.035);runtime.later(()=>button.classList.remove("zapped"),400);updateHud();return;}
+        transiting=true;portals.forEach(p=>p.el.disabled=true);
+        hero.classList.add("portal-vanish");beep(720,.07,"square",.03);
+        const nextHop=hops+1;const landingX=lane;
+        runtime.later(()=>{
+          hops=nextHop;place(hero,landingX,rows[hops],63);hero.classList.remove("portal-vanish");hero.classList.add("portal-arrive");
+          runtime.later(()=>hero?.classList.remove("portal-arrive"),420);
+          score+=250+(lane===(level%2===0?22:78)?200:0);transiting=false;updateHud();
+          if(hops===5){arriveHome();return;}updateGates();
+        },300);
       }
-
-      function tick(){if(!running||paused||!roundOverlay.hidden||!resultOverlay.hidden)return;time--;if(time<=8)mission.classList.add("urgent");updateMission();if(time<=0)finish(false);else if(time<=8)beep(185,.035,"square",.02);}
-
-      function updateMission(){
-        if(!mission)return;const cfg=levels[level];
-        mission.innerHTML=`<span>ROUND ${level+1}/3 · ${cfg.name}</span><b>COLLECT ${cfg.item.toUpperCase()}</b><small>${collected} of ${cfg.goal} collected · avoid purple glitches</small>`;
-        setHud("Round",`${level+1}/3`,cfg.item,`${collected}/${cfg.goal}`,"Time",time);
+      function arriveHome(){
+        const cfg=levels[level];score+=500;beep(850,.12,"square",.04);
+        if(level===levels.length-1){finish();return;}
+        running=false;level++;showRound(`Stage ${level} Complete`,`${cfg.name} made it home!`,`Next up: ${levels[level].name}. Same simple move: tap an OPEN portal, avoid the purple glitch, reach HOME.`,`Meet ${levels[level].name}`,()=>{roundOverlay.hidden=true;running=true;buildStage();runtime.frame(loop);});
       }
-
-      function completeLevel(){
-        if(!running)return;running=false;const cfg=levels[level];score+=time*45+bestCombo*80;const finished=level+1;
-        if(finished>=levels.length){finish(true);return;}
-        level=finished;
-        showRound(`Round ${finished} Complete`,`${cfg.item} Collected!`,`Next: ${levels[level].name}. Drag to collect ${levels[level].item.toLowerCase()} and keep avoiding the purple glitch blocks.`,`Start Round ${level+1}`,()=>{roundOverlay.hidden=true;running=true;startLevel();});
-      }
-
-      function finish(won){
-        if(!running&&!(won&&finishing))return;running=false;const stars=won?(totalHits===0&&bestCombo>=5?3:totalHits<=4?2:1):(level>=1?1:0);
-        completeGame({score,stars,kicker:won?"Three Rounds Complete":"Pixel Run Ended",title:won?"PIXEL SISTERS WIN!":"THE GLITCH GOT AWAY!",line:won?`Bones collected. Crowns secured. Hearts gathered.<br><b>“Simple, efficient, and still more excitement than I authorized.” — Bootsie Belle</b>`:`The Pixel Sisters are ready to try the collection run again.`,playAgainLabel:"Play Collect & Dash Again",arcadeLabel:"Play a Different Game"});
-      }
-
-      return{start,stop(){running=false;},destroy(){running=false;runtime.clear();stage.classList.remove("pixel-stage");world.classList.remove("pixel-world");delete world.dataset.pixelLevel;}};
+      function loop(timestamp){if(!running)return;now=timestamp;if(!paused&&roundOverlay.hidden&&resultOverlay.hidden&&!transiting)updateGates();runtime.frame(loop);}
+      function finish(){running=false;const stars=glitches===0?3:glitches<=7?2:1;
+        completeGame({score,stars,kicker:"Eight Characters Rescued",title:"EVERYONE MADE IT HOME!",line:`Eight pixel pals hopped safely through the portals!${glitches?` You took ${glitches} glitch-zaps along the way.`:" Not one glitch got you!"}<br><b>Great portal piloting!</b>`,playAgainLabel:"Play Portal Hop Again",arcadeLabel:"Choose Another Game"});}
+      return{start,stop(){running=false;},destroy(){running=false;runtime.clear();stage.classList.remove("pixel-stage","portal-stage");world.classList.remove("pixel-world","portal-world");delete world.dataset.pixelLevel;}};
     }
   };
 
@@ -1083,5 +1036,5 @@
   renderArcade();
   const requestedGame = new URLSearchParams(window.location.search).get("game");
   if (requestedGame && !openGame(requestedGame,false)) setGameUrl(null);
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=22").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=23").catch(()=>{}));
 })();
