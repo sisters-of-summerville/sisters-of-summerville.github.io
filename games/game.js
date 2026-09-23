@@ -75,6 +75,13 @@
       background: "assets/backyard.webp", character: "assets/maggie-jean.webp",
       instructions: "Drag to steer Maggie Jean. Grab every letter, chain deliveries for bigger points, hit yellow TURBO stamps for a burst of ridiculous speed, dodge sprinklers and squirrels, then slam into the mailbox before time expires.",
       rewards: ["Turbo speed bursts", "Mail-chain multipliers", "Three escalating delivery sprints"], button: "ENGAGE TURBO"
+    },
+    {
+      id: "pixelpanic", title: "Pixel Sisters: Portal Panic!", kicker: "8-Bit Summerville Rescue",
+      description: "Switch between Pixel Honey and Pixel Bootsie, rescue six friends, and repair Summerville before the glitch takes over.",
+      background: "assets/pixel-summerville.png", character: "assets/pixel-sisters.png",
+      instructions: "Tap or drag anywhere to move. Switch between Honey Bear and Bootsie Belle at any time: Honey collects pink bones, while Bootsie collects gold crowns. Reach trapped friends with the sister shown above them, dodge moving glitch blocks, then enter the portal after every rescue and pickup is complete.",
+      rewards: ["Switch-character strategy", "Six pixel friends to rescue", "Three escalating glitch levels"], button: "ENTER THE PIXEL PORTAL"
     }
   ];
 
@@ -918,6 +925,173 @@
       function update(){const need=levels[level]?.mail||0;const turbo=Math.max(0,Math.ceil((turboUntil-performance.now())/1000));setHud("Sprint",`${Math.min(level+1,3)}/3`,"Mail",`${mailHit}/${need}`,turbo>0?"TURBO":"Time",turbo>0?`${turbo}s`:time);}
       function finish(won){if(!running)return;running=false;const stars=won?(totalHits===0&&bestChain>=5?3:totalHits<=3?2:1):(level>=1?1:0);completeGame({score,stars,kicker:won?"Three Sprints Delivered":"Delivery Run Ended",title:won?"SNAIL MAIL WENT SUPERSONIC!":"Turbo Delivery Wipeout!",line:won?`“I have filed a formal complaint with the laws of physics.”<br><b>— Bootsie Belle</b><br><small>What would you like to play next?</small>`:`“At least traditional snail mail has fewer sprinkler incidents.”<br><b>— Bootsie Belle</b>`,playAgainLabel:"Play Snail Mail Again",arcadeLabel:"Play a Different Game"});}
       return{start,stop(){running=false;},destroy(){running=false;runtime.clear();}};
+    },
+
+    pixelpanic() {
+      const runtime=makeRuntime();
+      const levels=[
+        {name:"Yard Boot Sequence",time:50,bones:3,crowns:3,hazards:2,start:"honey",friends:[
+          {name:"Spot",sheet:"a",slot:0,hero:"bootsie"},{name:"Hershey",sheet:"a",slot:1,hero:"honey"}
+        ]},
+        {name:"Website Takeover",time:46,bones:4,crowns:4,hazards:3,start:"bootsie",friends:[
+          {name:"Gumbo",sheet:"a",slot:2,hero:"honey"},{name:"Tiffany",sheet:"b",slot:1,hero:"bootsie"}
+        ]},
+        {name:"Parental-Control Finale",time:42,bones:5,crowns:5,hazards:4,start:"honey",friends:[
+          {name:"Cap'n Oh Yeah",sheet:"b",slot:0,hero:"honey"},{name:"Radar",sheet:"b",slot:2,hero:"bootsie"}
+        ]}
+      ];
+      const spots=[
+        {x:14,y:32},{x:24,y:25},{x:35,y:34},{x:46,y:28},{x:58,y:34},{x:70,y:26},{x:84,y:33},
+        {x:18,y:49},{x:31,y:48},{x:43,y:53},{x:57,y:48},{x:69,y:55},{x:82,y:49},
+        {x:13,y:69},{x:25,y:73},{x:38,y:67},{x:50,y:77},{x:62,y:68},{x:75,y:75},{x:87,y:67},
+        {x:32,y:82},{x:67,y:83},{x:91,y:53}
+      ];
+      let level=0,running=false,time=0,score=0,active="honey",playerState,playerEl,tokens=[],friends=[],hazards=[];
+      let tokenCount=0,rescueCount=0,totalHits=0,combo=0,bestCombo=0,lastPickup=0,last=0,lastWrong=0,portal,mission,switcher;
+
+      function start(){
+        stage.classList.add("pixel-stage");world.classList.add("pixel-world");
+        runtime.on(stage,"pointerdown",pointerDown);
+        runtime.on(stage,"pointermove",pointerMove);
+        runtime.on(stage,"pointerup",pointerUp);
+        runtime.on(stage,"pointercancel",pointerUp);
+        runtime.every(tick,1000);
+        running=true;startLevel();
+      }
+
+      function startLevel(){
+        world.innerHTML="";tokens=[];friends=[];hazards=[];tokenCount=0;rescueCount=0;combo=0;
+        const cfg=levels[level];time=cfg.time;active=cfg.start;
+        world.dataset.pixelLevel=String(level+1);
+        playerState={x:50,y:84,vx:0,vy:0,targetX:50,targetY:84,dragging:false};
+        playerEl=create("div",`pixel-hero pixel-${active}`);
+        playerEl.setAttribute("aria-label",active==="honey"?"Pixel Honey Bear":"Pixel Bootsie Belle");
+        place(playerEl,playerState.x,playerState.y,65);
+
+        mission=create("div","pixel-mission");
+        portal=create("div","pixel-portal-gate locked");portal.innerHTML="<i></i><b>PORTAL LOCKED</b>";place(portal,50,20,42);
+        switcher=create("div","pixel-switcher");
+        switcher.innerHTML='<button type="button" data-hero="honey">🐾 HONEY</button><button type="button" data-hero="bootsie">♛ BOOTSIE</button>';
+        switcher.querySelectorAll("button").forEach(button=>{
+          runtime.on(button,"pointerdown",event=>event.stopPropagation());
+          runtime.on(button,"click",event=>{event.stopPropagation();switchTo(button.dataset.hero);});
+        });
+        switchTo(active,false);
+
+        const chosen=shuffle(spots);let cursor=0;
+        for(let i=0;i<cfg.bones;i++)addToken("honey",chosen[cursor++]);
+        for(let i=0;i<cfg.crowns;i++)addToken("bootsie",chosen[cursor++]);
+        cfg.friends.forEach(friend=>addFriend(friend,chosen[cursor++]));
+        for(let i=0;i<cfg.hazards;i++)addHazard(chosen[cursor++],i);
+        updateMission();last=performance.now();runtime.frame(loop);
+      }
+
+      function addToken(hero,pos){
+        const el=create("div",`pixel-token ${hero}-token`);el.innerHTML=hero==="honey"?"<span>🦴</span><b>HONEY</b>":"<span>♛</span><b>BOOTSIE</b>";
+        place(el,pos.x,pos.y,48);tokens.push({...pos,hero,hit:false,el});
+      }
+
+      function addFriend(friend,pos){
+        const el=create("div",`pixel-friend friend-sheet-${friend.sheet} friend-slot-${friend.slot}`);
+        el.innerHTML=`<i></i><b>${friend.name}<small>${friend.hero.toUpperCase()}</small></b>`;
+        place(el,pos.x,pos.y,52);friends.push({...friend,...pos,rescued:false,el});
+      }
+
+      function addHazard(pos,index){
+        const el=create("div","pixel-glitch");el.innerHTML="<i></i><i></i><i></i>";place(el,pos.x,pos.y,58);
+        hazards.push({...pos,baseX:pos.x,baseY:pos.y,phase:index*1.9+level,hitAt:0,el});
+      }
+
+      function pointerDown(event){
+        if(paused||!running||event.target.closest(".pixel-switcher"))return;
+        playerState.dragging=true;stage.setPointerCapture?.(event.pointerId);setTarget(event);
+      }
+      function pointerMove(event){if(playerState?.dragging&&!paused)setTarget(event);}
+      function pointerUp(){if(playerState)playerState.dragging=false;}
+      function setTarget(event){const point=eventPoint(event);playerState.targetX=point.x;playerState.targetY=point.y;}
+
+      function switchTo(hero,sound=true){
+        active=hero;playerEl.className=`pixel-hero pixel-${hero}`;playerEl.setAttribute("aria-label",hero==="honey"?"Pixel Honey Bear":"Pixel Bootsie Belle");
+        switcher?.querySelectorAll("button").forEach(button=>button.classList.toggle("active",button.dataset.hero===hero));
+        if(sound){beep(hero==="honey"?520:690,.06,"square",.03);popText(playerState.x,playerState.y,hero==="honey"?"HONEY MODE!":"BOOTSIE MODE!");}
+        updateMission();
+      }
+
+      function movePlayer(dt){
+        let keyX=0,keyY=0;if(heldKeys.has("ArrowLeft")||heldKeys.has("a"))keyX--;if(heldKeys.has("ArrowRight")||heldKeys.has("d"))keyX++;if(heldKeys.has("ArrowUp")||heldKeys.has("w"))keyY--;if(heldKeys.has("ArrowDown")||heldKeys.has("s"))keyY++;
+        let dx=0,dy=0;if(keyX||keyY){dx=keyX;dy=keyY;}else if(playerState.dragging){dx=playerState.targetX-playerState.x;dy=playerState.targetY-playerState.y;}
+        const length=Math.hypot(dx,dy);if(length>1){const accel=active==="honey"?.42:.36;playerState.vx+=dx/length*accel*dt;playerState.vy+=dy/length*accel*dt;}
+        const max=active==="honey"?1.35:1.16;const speed=Math.hypot(playerState.vx,playerState.vy);if(speed>max){playerState.vx=playerState.vx/speed*max;playerState.vy=playerState.vy/speed*max;}
+        playerState.x+=playerState.vx*dt;playerState.y+=playerState.vy*dt;playerState.vx*=Math.pow(.90,dt);playerState.vy*=Math.pow(.90,dt);
+        if(playerState.x<7||playerState.x>93)playerState.vx*=-.55;if(playerState.y<22||playerState.y>90)playerState.vy*=-.55;
+        playerState.x=Math.max(7,Math.min(93,playerState.x));playerState.y=Math.max(22,Math.min(90,playerState.y));
+        place(playerEl,playerState.x,playerState.y,65+Math.round(playerState.y));playerEl.style.setProperty("--tilt",`${Math.max(-6,Math.min(6,playerState.vx*5))}deg`);
+      }
+
+      function loop(now){
+        if(!running)return;const dt=Math.min((now-last)/16.667,2.2);last=now;
+        if(!paused&&roundOverlay.hidden&&resultOverlay.hidden){
+          movePlayer(dt);
+          hazards.forEach((hazard,index)=>{
+            hazard.x=hazard.baseX+Math.sin(now/(650-level*70)+hazard.phase)*(4+level*1.5);
+            hazard.y=hazard.baseY+Math.cos(now/(780-level*65)+hazard.phase)*(3+level);
+            place(hazard.el,hazard.x,hazard.y,58);
+            if(now-hazard.hitAt>1200&&distance(playerState,hazard)<7.5)hitHazard(hazard);
+          });
+          tokens.forEach(token=>{if(!token.hit&&distance(playerState,token)<6.6)collectToken(token,now);});
+          friends.forEach(friend=>{if(!friend.rescued&&distance(playerState,friend)<8.2)rescueFriend(friend,now);});
+          if(portal.classList.contains("open")&&distance(playerState,{x:50,y:20})<9)completeLevel();
+        }
+        runtime.frame(loop);
+      }
+
+      function collectToken(token,now){
+        if(token.hero!==active){wrongHero(now,token.hero);return;}
+        token.hit=true;token.el.classList.add("collected");tokenCount++;combo=now-lastPickup<2400?combo+1:1;lastPickup=now;bestCombo=Math.max(bestCombo,combo);
+        const gain=220+Math.min(combo,6)*55;score+=gain;popText(token.x,token.y,combo>=3?`${combo}× PIXEL CHAIN!`:token.hero==="honey"?"BONE GRABBED!":"CROWN HACKED!");beep(active==="honey"?610:760,.055,"square",.03);checkPortal();updateMission();
+      }
+
+      function rescueFriend(friend,now){
+        if(friend.hero!==active){wrongHero(now,friend.hero);return;}
+        friend.rescued=true;friend.el.classList.add("rescued");rescueCount++;score+=650+time*4;combo++;
+        popText(friend.x,friend.y,`${friend.name.toUpperCase()} SAVED!`);beep(880,.11,"square",.04);runtime.later(()=>friend.el.remove(),700);checkPortal();updateMission();
+      }
+
+      function wrongHero(now,needed){
+        if(now-lastWrong<1100)return;lastWrong=now;combo=0;
+        popText(playerState.x,playerState.y,needed==="honey"?"SWITCH TO HONEY!":"SWITCH TO BOOTSIE!");beep(150,.07,"square",.025);
+      }
+
+      function hitHazard(hazard){
+        hazard.hitAt=performance.now();totalHits++;combo=0;time=Math.max(0,time-3);score=Math.max(0,score-140);playerState.vx*=-2;playerState.vy*=-2;
+        hazard.el.classList.add("hit");runtime.later(()=>hazard.el.classList.remove("hit"),360);popText(hazard.x,hazard.y,"GLITCHED! −3");beep(95,.14,"sawtooth",.04);updateMission();
+      }
+
+      function checkPortal(){
+        const cfg=levels[level];if(tokenCount===cfg.bones+cfg.crowns&&rescueCount===cfg.friends.length){portal.classList.remove("locked");portal.classList.add("open");portal.querySelector("b").textContent="PORTAL OPEN";showCombo("Portal repaired — jump in!");}
+      }
+
+      function tick(){if(!running||paused||!roundOverlay.hidden||!resultOverlay.hidden)return;time--;if(time<=8)mission.classList.add("urgent");updateMission();if(time<=0)finish(false);else if(time<=8)beep(185,.035,"square",.02);}
+
+      function updateMission(){
+        if(!mission)return;const cfg=levels[level];const total=cfg.bones+cfg.crowns;
+        mission.innerHTML=`<span>LEVEL ${level+1}/3 · ${cfg.name}</span><b>${active==="honey"?"Honey":"Bootsie"} is active</b><small>${tokenCount}/${total} items · ${rescueCount}/${cfg.friends.length} friends · ${portal?.classList.contains("open")?"PORTAL OPEN":"portal locked"}</small>`;
+        setHud("Level",`${level+1}/3`,"Rescued",`${rescueCount}/${cfg.friends.length}`,"Time",time);
+      }
+
+      function completeLevel(){
+        if(!running)return;const cfg=levels[level];score+=time*45+bestCombo*80;const finished=level+1;
+        if(finished>=levels.length){finish(true);return;}
+        running=false;level=finished;
+        showRound(`Pixel Level ${finished} Cleared`,"Portal Stabilized!",`Next: ${levels[level].name}. The corruption is faster, the timer is tighter, and two more friends need the Pixel Sisters.`,`Enter Level ${level+1}`,()=>{roundOverlay.hidden=true;running=true;startLevel();});
+      }
+
+      function finish(won){
+        if(!running)return;running=false;const stars=won?(totalHits===0&&bestCombo>=5?3:totalHits<=4?2:1):(level>=1?1:0);
+        completeGame({score,stars,kicker:won?"All Three Pixel Worlds Repaired":"Portal Emergency",title:won?"SUMMERVILLE RESTORED!":"THE GLITCH GOT LOOSE!",line:won?`Honey chased the chaos. Bootsie hacked reality. Six friends made it safely home.<br><b>“One of me is elegance. Two of me is apparently a security threat.” — Bootsie Belle</b>`:`The portal is still unstable—but the Pixel Sisters never leave a corrupted website unfinished.`,playAgainLabel:"Play Portal Panic Again",arcadeLabel:"Play a Different Game"});
+      }
+
+      return{start,stop(){running=false;},destroy(){running=false;runtime.clear();stage.classList.remove("pixel-stage");world.classList.remove("pixel-world");delete world.dataset.pixelLevel;}};
     }
   };
 
@@ -956,5 +1130,5 @@
   renderArcade();
   const requestedGame = new URLSearchParams(window.location.search).get("game");
   if (requestedGame && !openGame(requestedGame,false)) setGameUrl(null);
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=20").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=21").catch(()=>{}));
 })();

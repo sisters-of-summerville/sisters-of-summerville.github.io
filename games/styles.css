@@ -224,6 +224,49 @@ body.game-setup .game-stage,body.game-setup .instruction-overlay{touch-action:pa
 body.game-setup .instruction-overlay{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;place-items:start center}
 body.game-setup .instruction-card{margin:auto}
 
+/* Pixel Sisters: Portal Panic — coarse 8-bit raster game. */
+.pixel-stage .background-layer{image-rendering:pixelated;background-size:cover;background-position:center}
+.pixel-stage::before{content:"";position:absolute;inset:0;z-index:7;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 5px,#3012590a 5px 6px);mix-blend-mode:multiply}
+.pixel-world{image-rendering:pixelated}
+.pixel-world[data-pixel-level="2"]::before,.pixel-world[data-pixel-level="3"]::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 0 47%,#ff37dc18 48% 50%,transparent 51%),linear-gradient(0deg,transparent 0 68%,#23dbff14 69% 71%,transparent 72%);animation:pixelScan 3.8s steps(8,end) infinite}
+.pixel-world[data-pixel-level="3"]::before{animation-duration:2.3s;opacity:.9}
+
+.pixel-hero{position:absolute;width:clamp(88px,12vw,165px);aspect-ratio:1;transform:translate(-50%,-76%) rotate(var(--tilt,0deg));background-image:url("assets/pixel-sisters.png");background-size:200% 100%;background-repeat:no-repeat;image-rendering:pixelated;filter:drop-shadow(0 8px 0 #20103988);pointer-events:none;will-change:left,top,transform}
+.pixel-hero.pixel-honey{background-position:left center}.pixel-hero.pixel-bootsie{background-position:right center}
+.pixel-hero::after{content:"";position:absolute;left:18%;right:18%;bottom:2%;height:9%;z-index:-1;border-radius:50%;background:#23113d55;filter:blur(2px)}
+
+.pixel-mission{position:absolute;left:2%;top:2%;z-index:76;min-width:min(320px,45%);padding:8px 11px;border:4px solid #17102c;border-radius:4px;color:#17102c;background:#fff2a9ee;box-shadow:5px 5px 0 #8a205d;font-family:"Courier New",monospace;font-weight:1000;text-transform:uppercase;pointer-events:none}
+.pixel-mission span,.pixel-mission b,.pixel-mission small{display:block}.pixel-mission span{color:#8e1d65;font-size:clamp(.55rem,.9vw,.72rem)}.pixel-mission b{margin:2px 0;font-size:clamp(.78rem,1.5vw,1.05rem)}.pixel-mission small{font-size:clamp(.5rem,.8vw,.66rem)}.pixel-mission.urgent{color:#fff;background:#a92145;box-shadow:5px 5px 0 #ffe23c;animation:pixelUrgent .45s steps(2,end) infinite}.pixel-mission.urgent span{color:#ffe23c}
+
+.pixel-switcher{position:absolute;left:50%;bottom:2%;z-index:79;display:grid;grid-template-columns:1fr 1fr;transform:translateX(-50%);overflow:hidden;border:4px solid #17102c;border-radius:6px;background:#17102c;box-shadow:5px 5px 0 #721f62}
+.pixel-switcher button{min-width:clamp(112px,17vw,190px);min-height:46px;padding:8px 10px;border:0;color:#fff;background:#48265f;font-family:"Courier New",monospace;font-size:clamp(.72rem,1.25vw,.95rem);font-weight:1000;letter-spacing:.03em;cursor:pointer;text-shadow:2px 2px 0 #17102c}.pixel-switcher button+button{border-left:3px solid #17102c}.pixel-switcher button.active{color:#241029;background:#ffe13f;box-shadow:inset 0 -5px 0 #f18b3a;text-shadow:none}.pixel-switcher button:active{transform:translateY(2px)}
+
+.pixel-token{position:absolute;width:clamp(54px,7vw,88px);aspect-ratio:1;transform:translate(-50%,-50%);display:grid;place-items:center;border:4px solid #17102c;border-radius:4px;background:#20133fd9;box-shadow:5px 5px 0 #17102c88;color:#fff;image-rendering:pixelated;animation:pixelBob .7s steps(3,end) infinite alternate;pointer-events:none}.pixel-token span{font-size:clamp(1.55rem,3.4vw,2.8rem);line-height:.8}.pixel-token b{font:1000 clamp(.42rem,.75vw,.62rem)/1 "Courier New",monospace}.pixel-token.honey-token{outline:4px solid #ff4fa3}.pixel-token.bootsie-token{outline:4px solid #ffe13f}.pixel-token.collected{animation:pixelCollect .35s steps(4,end) forwards}
+
+.pixel-friend{position:absolute;width:clamp(88px,11vw,150px);aspect-ratio:1;transform:translate(-50%,-72%);display:grid;place-items:center;pointer-events:none;filter:drop-shadow(0 8px 0 #28143b88)}
+.pixel-friend i{display:block;width:100%;height:100%;background-repeat:no-repeat;background-size:300% 100%;image-rendering:pixelated;filter:grayscale(.65) brightness(.72) sepia(.25)}
+.pixel-friend.friend-sheet-a i{background-image:url("assets/pixel-friends-a.png")}.pixel-friend.friend-sheet-b i{background-image:url("assets/pixel-friends-b.png")}
+.pixel-friend.friend-slot-0 i{background-position:left center}.pixel-friend.friend-slot-1 i{background-position:center center}.pixel-friend.friend-slot-2 i{background-position:right center}
+.pixel-friend>b{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);min-width:82%;padding:4px 6px;border:3px solid #17102c;border-radius:3px;color:#fff;background:#732362;font:1000 clamp(.5rem,.9vw,.7rem)/1 "Courier New",monospace;text-align:center;text-transform:uppercase;white-space:nowrap;box-shadow:3px 3px 0 #17102c}.pixel-friend b small{display:block;margin-top:2px;color:#ffe13f;font-size:.82em}.pixel-friend::after{content:"";position:absolute;inset:-5%;border:5px solid #2de0ff;border-radius:8px;box-shadow:0 0 0 4px #ff40c566,0 0 18px #2de0ff;animation:pixelCage .55s steps(2,end) infinite alternate}.pixel-friend.rescued{animation:pixelRescue .65s steps(6,end) forwards}.pixel-friend.rescued i{filter:none}.pixel-friend.rescued::after{display:none}
+
+.pixel-glitch{position:absolute;width:clamp(58px,7vw,94px);aspect-ratio:1;transform:translate(-50%,-50%);border:4px solid #17102c;background:#501f76;box-shadow:5px 5px 0 #17102c88;animation:glitchBox .55s steps(2,end) infinite;pointer-events:none}.pixel-glitch i{position:absolute;display:block;background:#ff42c8}.pixel-glitch i:nth-child(1){left:9%;top:14%;width:60%;height:18%}.pixel-glitch i:nth-child(2){right:8%;top:43%;width:56%;height:20%;background:#25dbff}.pixel-glitch i:nth-child(3){left:17%;bottom:10%;width:68%;height:15%;background:#ffe13f}.pixel-glitch.hit{animation:glitchHit .34s steps(4,end)}
+
+.pixel-portal-gate{position:absolute;width:clamp(105px,14vw,190px);aspect-ratio:1.25;transform:translate(-50%,-45%);display:grid;place-items:center;pointer-events:none}.pixel-portal-gate i{width:70%;aspect-ratio:1;border:10px solid #4d2a63;border-radius:50%;background:repeating-conic-gradient(#542964 0 12deg,#251333 12deg 24deg);box-shadow:0 0 0 6px #1c1026aa;animation:portalSpin 1.2s steps(8,end) infinite}.pixel-portal-gate b{position:absolute;bottom:-4px;padding:4px 7px;border:3px solid #17102c;border-radius:3px;color:#fff;background:#57245f;font:1000 clamp(.48rem,.8vw,.68rem)/1 "Courier New",monospace;white-space:nowrap}.pixel-portal-gate.open i{border-color:#ff41cc;background:repeating-conic-gradient(#24e0ff 0 12deg,#ff41cc 12deg 24deg);box-shadow:0 0 0 6px #fff29b,0 0 26px #ff41cc}.pixel-portal-gate.open b{color:#22102b;background:#ffe13f;animation:portalLabel .5s steps(2,end) infinite}
+
+@keyframes pixelBob{to{transform:translate(-50%,-58%)}}
+@keyframes pixelCollect{to{opacity:0;transform:translate(-50%,-50%) scale(2) rotate(20deg)}}
+@keyframes pixelCage{to{border-color:#ff41cc;box-shadow:0 0 0 4px #2de0ff66,0 0 22px #ff41cc}}
+@keyframes pixelRescue{40%{transform:translate(-50%,-95%) scale(1.25);filter:drop-shadow(0 0 16px #fff)}100%{opacity:0;transform:translate(-50%,-120%) scale(.7)}}
+@keyframes glitchBox{0%{clip-path:polygon(0 0,100% 7%,92% 100%,5% 91%)}100%{clip-path:polygon(7% 4%,94% 0,100% 92%,0 100%);transform:translate(-50%,-50%) translateX(4px)}}
+@keyframes glitchHit{50%{transform:translate(-50%,-50%) scale(1.45) rotate(18deg);filter:brightness(2)}100%{transform:translate(-50%,-50%) scale(.8) rotate(-12deg)}}
+@keyframes portalSpin{to{transform:rotate(360deg)}}
+@keyframes portalLabel{50%{transform:translateY(-3px)}}
+@keyframes pixelUrgent{50%{filter:brightness(1.45)}}
+@keyframes pixelScan{to{transform:translateY(8%)}}
+
+@media(max-width:680px){.pixel-hero{width:clamp(78px,15vw,125px)}.pixel-friend{width:clamp(72px,13vw,112px)}.pixel-switcher button{min-width:102px;min-height:42px;padding:6px}.pixel-mission{min-width:44%;max-width:52%;padding:6px 7px}.pixel-token{width:56px}.pixel-portal-gate{width:120px}}
+@media(max-height:620px){.pixel-switcher{bottom:1%}.pixel-switcher button{min-height:38px;padding:5px 8px}.pixel-mission{top:1%;padding:5px 7px}.pixel-hero{width:105px}.pixel-friend{width:96px}.pixel-token{width:52px}.pixel-portal-gate{width:105px}}
+
 /* Always use dark ink on cream, gold, or pink controls. */
 .power-readout,.green-label,.case-guide,.watch-status,.hint-button,.route-banner,
 .rescue-mission-panel,.rescue-status,.meemaw-help{color:#2b140f}
