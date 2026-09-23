@@ -233,6 +233,7 @@ body.game-setup .instruction-card{margin:auto}
 
 .pixel-hero{position:absolute;width:clamp(88px,12vw,165px);aspect-ratio:1;transform:translate(-50%,-76%) rotate(var(--tilt,0deg));background-image:url("assets/pixel-sisters.png");background-size:200% 100%;background-repeat:no-repeat;image-rendering:pixelated;filter:drop-shadow(0 8px 0 #20103988);pointer-events:none;will-change:left,top,transform}
 .pixel-hero.pixel-honey{background-position:left center}.pixel-hero.pixel-bootsie{background-position:right center}
+.pixel-hero.pixel-duo{width:clamp(165px,23vw,300px);aspect-ratio:2/1;background-size:100% 100%;background-position:center}
 .pixel-hero::after{content:"";position:absolute;left:18%;right:18%;bottom:2%;height:9%;z-index:-1;border-radius:50%;background:#23113d55;filter:blur(2px)}
 
 .pixel-mission{position:absolute;left:2%;top:2%;z-index:76;min-width:min(320px,45%);padding:8px 11px;border:4px solid #17102c;border-radius:4px;color:#17102c;background:#fff2a9ee;box-shadow:5px 5px 0 #8a205d;font-family:"Courier New",monospace;font-weight:1000;text-transform:uppercase;pointer-events:none}
@@ -241,7 +242,7 @@ body.game-setup .instruction-card{margin:auto}
 .pixel-switcher{position:absolute;left:50%;bottom:2%;z-index:79;display:grid;grid-template-columns:1fr 1fr;transform:translateX(-50%);overflow:hidden;border:4px solid #17102c;border-radius:6px;background:#17102c;box-shadow:5px 5px 0 #721f62}
 .pixel-switcher button{min-width:clamp(112px,17vw,190px);min-height:46px;padding:8px 10px;border:0;color:#fff;background:#48265f;font-family:"Courier New",monospace;font-size:clamp(.72rem,1.25vw,.95rem);font-weight:1000;letter-spacing:.03em;cursor:pointer;text-shadow:2px 2px 0 #17102c}.pixel-switcher button+button{border-left:3px solid #17102c}.pixel-switcher button.active{color:#241029;background:#ffe13f;box-shadow:inset 0 -5px 0 #f18b3a;text-shadow:none}.pixel-switcher button:active{transform:translateY(2px)}
 
-.pixel-token{position:absolute;width:clamp(54px,7vw,88px);aspect-ratio:1;transform:translate(-50%,-50%);display:grid;place-items:center;border:4px solid #17102c;border-radius:4px;background:#20133fd9;box-shadow:5px 5px 0 #17102c88;color:#fff;image-rendering:pixelated;animation:pixelBob .7s steps(3,end) infinite alternate;pointer-events:none}.pixel-token span{font-size:clamp(1.55rem,3.4vw,2.8rem);line-height:.8}.pixel-token b{font:1000 clamp(.42rem,.75vw,.62rem)/1 "Courier New",monospace}.pixel-token.honey-token{outline:4px solid #ff4fa3}.pixel-token.bootsie-token{outline:4px solid #ffe13f}.pixel-token.collected{animation:pixelCollect .35s steps(4,end) forwards}
+.pixel-token{position:absolute;width:clamp(54px,7vw,88px);aspect-ratio:1;transform:translate(-50%,-50%);display:grid;place-items:center;border:4px solid #17102c;border-radius:4px;background:#20133fd9;box-shadow:5px 5px 0 #17102c88;color:#fff;image-rendering:pixelated;animation:pixelBob .7s steps(3,end) infinite alternate;pointer-events:none}.pixel-token span{font-size:clamp(1.55rem,3.4vw,2.8rem);line-height:.8}.pixel-token b{font:1000 clamp(.42rem,.75vw,.62rem)/1 "Courier New",monospace}.pixel-token.honey-token{outline:4px solid #ff4fa3}.pixel-token.bootsie-token{outline:4px solid #ffe13f}.pixel-token.duo-token{outline:4px solid #2de0ff;color:#ff65ba}.pixel-token.duo-token span{text-shadow:3px 3px 0 #17102c}.pixel-token.collected{animation:pixelCollect .35s steps(4,end) forwards}
 
 .pixel-friend{position:absolute;width:clamp(88px,11vw,150px);aspect-ratio:1;transform:translate(-50%,-72%);display:grid;place-items:center;pointer-events:none;filter:drop-shadow(0 8px 0 #28143b88)}
 .pixel-friend i{display:block;width:100%;height:100%;background-repeat:no-repeat;background-size:300% 100%;image-rendering:pixelated;filter:grayscale(.65) brightness(.72) sepia(.25)}
@@ -264,7 +265,7 @@ body.game-setup .instruction-card{margin:auto}
 @keyframes pixelUrgent{50%{filter:brightness(1.45)}}
 @keyframes pixelScan{to{transform:translateY(8%)}}
 
-@media(max-width:680px){.pixel-hero{width:clamp(78px,15vw,125px)}.pixel-friend{width:clamp(72px,13vw,112px)}.pixel-switcher button{min-width:102px;min-height:42px;padding:6px}.pixel-mission{min-width:44%;max-width:52%;padding:6px 7px}.pixel-token{width:56px}.pixel-portal-gate{width:120px}}
+@media(max-width:680px){.pixel-hero{width:clamp(78px,15vw,125px)}.pixel-hero.pixel-duo{width:clamp(145px,28vw,230px)}.pixel-friend{width:clamp(72px,13vw,112px)}.pixel-switcher button{min-width:102px;min-height:42px;padding:6px}.pixel-mission{min-width:44%;max-width:52%;padding:6px 7px}.pixel-token{width:56px}.pixel-portal-gate{width:120px}}
 @media(max-height:620px){.pixel-switcher{bottom:1%}.pixel-switcher button{min-height:38px;padding:5px 8px}.pixel-mission{top:1%;padding:5px 7px}.pixel-hero{width:105px}.pixel-friend{width:96px}.pixel-token{width:52px}.pixel-portal-gate{width:105px}}
 
 /* Always use dark ink on cream, gold, or pink controls. */
