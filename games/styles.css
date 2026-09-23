@@ -224,50 +224,6 @@ body.game-setup .game-stage,body.game-setup .instruction-overlay{touch-action:pa
 body.game-setup .instruction-overlay{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;place-items:start center}
 body.game-setup .instruction-card{margin:auto}
 
-/* Pixel Sisters: Portal Panic — coarse 8-bit raster game. */
-.pixel-stage .background-layer{image-rendering:pixelated;background-size:cover;background-position:center}
-.pixel-stage::before{content:"";position:absolute;inset:0;z-index:7;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 5px,#3012590a 5px 6px);mix-blend-mode:multiply}
-.pixel-world{image-rendering:pixelated}
-.pixel-world[data-pixel-level="2"]::before,.pixel-world[data-pixel-level="3"]::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 0 47%,#ff37dc18 48% 50%,transparent 51%),linear-gradient(0deg,transparent 0 68%,#23dbff14 69% 71%,transparent 72%);animation:pixelScan 3.8s steps(8,end) infinite}
-.pixel-world[data-pixel-level="3"]::before{animation-duration:2.3s;opacity:.9}
-
-.pixel-hero{position:absolute;width:clamp(88px,12vw,165px);aspect-ratio:1;transform:translate(-50%,-76%) rotate(var(--tilt,0deg));background-image:url("assets/pixel-sisters.png");background-size:200% 100%;background-repeat:no-repeat;image-rendering:pixelated;filter:drop-shadow(0 8px 0 #20103988);pointer-events:none;will-change:left,top,transform}
-.pixel-hero.pixel-honey{background-position:left center}.pixel-hero.pixel-bootsie{background-position:right center}
-.pixel-hero.pixel-duo{width:clamp(165px,23vw,300px);aspect-ratio:2/1;background-size:100% 100%;background-position:center}
-.pixel-hero::after{content:"";position:absolute;left:18%;right:18%;bottom:2%;height:9%;z-index:-1;border-radius:50%;background:#23113d55;filter:blur(2px)}
-
-.pixel-mission{position:absolute;left:2%;top:2%;z-index:76;min-width:min(320px,45%);padding:8px 11px;border:4px solid #17102c;border-radius:4px;color:#17102c;background:#fff2a9ee;box-shadow:5px 5px 0 #8a205d;font-family:"Courier New",monospace;font-weight:1000;text-transform:uppercase;pointer-events:none}
-.pixel-mission span,.pixel-mission b,.pixel-mission small{display:block}.pixel-mission span{color:#8e1d65;font-size:clamp(.55rem,.9vw,.72rem)}.pixel-mission b{margin:2px 0;font-size:clamp(.78rem,1.5vw,1.05rem)}.pixel-mission small{font-size:clamp(.5rem,.8vw,.66rem)}.pixel-mission.urgent{color:#fff;background:#a92145;box-shadow:5px 5px 0 #ffe23c;animation:pixelUrgent .45s steps(2,end) infinite}.pixel-mission.urgent span{color:#ffe23c}
-
-.pixel-switcher{position:absolute;left:50%;bottom:2%;z-index:79;display:grid;grid-template-columns:1fr 1fr;transform:translateX(-50%);overflow:hidden;border:4px solid #17102c;border-radius:6px;background:#17102c;box-shadow:5px 5px 0 #721f62}
-.pixel-switcher button{min-width:clamp(112px,17vw,190px);min-height:46px;padding:8px 10px;border:0;color:#fff;background:#48265f;font-family:"Courier New",monospace;font-size:clamp(.72rem,1.25vw,.95rem);font-weight:1000;letter-spacing:.03em;cursor:pointer;text-shadow:2px 2px 0 #17102c}.pixel-switcher button+button{border-left:3px solid #17102c}.pixel-switcher button.active{color:#241029;background:#ffe13f;box-shadow:inset 0 -5px 0 #f18b3a;text-shadow:none}.pixel-switcher button:active{transform:translateY(2px)}
-
-.pixel-token{position:absolute;width:clamp(54px,7vw,88px);aspect-ratio:1;transform:translate(-50%,-50%);display:grid;place-items:center;border:4px solid #17102c;border-radius:4px;background:#20133fd9;box-shadow:5px 5px 0 #17102c88;color:#fff;image-rendering:pixelated;animation:pixelBob .7s steps(3,end) infinite alternate;pointer-events:none}.pixel-token span{font-size:clamp(1.55rem,3.4vw,2.8rem);line-height:.8}.pixel-token b{font:1000 clamp(.42rem,.75vw,.62rem)/1 "Courier New",monospace}.pixel-token.honey-token{outline:4px solid #ff4fa3}.pixel-token.bootsie-token{outline:4px solid #ffe13f}.pixel-token.duo-token{outline:4px solid #2de0ff;color:#ff65ba}.pixel-token.duo-token span{text-shadow:3px 3px 0 #17102c}.pixel-token.collected{animation:pixelCollect .35s steps(4,end) forwards}
-
-.pixel-friend{position:absolute;width:clamp(88px,11vw,150px);aspect-ratio:1;transform:translate(-50%,-72%);display:grid;place-items:center;pointer-events:none;filter:drop-shadow(0 8px 0 #28143b88)}
-.pixel-friend i{display:block;width:100%;height:100%;background-repeat:no-repeat;background-size:300% 100%;image-rendering:pixelated;filter:grayscale(.65) brightness(.72) sepia(.25)}
-.pixel-friend.friend-sheet-a i{background-image:url("assets/pixel-friends-a.png")}.pixel-friend.friend-sheet-b i{background-image:url("assets/pixel-friends-b.png")}
-.pixel-friend.friend-slot-0 i{background-position:left center}.pixel-friend.friend-slot-1 i{background-position:center center}.pixel-friend.friend-slot-2 i{background-position:right center}
-.pixel-friend>b{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);min-width:82%;padding:4px 6px;border:3px solid #17102c;border-radius:3px;color:#fff;background:#732362;font:1000 clamp(.5rem,.9vw,.7rem)/1 "Courier New",monospace;text-align:center;text-transform:uppercase;white-space:nowrap;box-shadow:3px 3px 0 #17102c}.pixel-friend b small{display:block;margin-top:2px;color:#ffe13f;font-size:.82em}.pixel-friend::after{content:"";position:absolute;inset:-5%;border:5px solid #2de0ff;border-radius:8px;box-shadow:0 0 0 4px #ff40c566,0 0 18px #2de0ff;animation:pixelCage .55s steps(2,end) infinite alternate}.pixel-friend.rescued{animation:pixelRescue .65s steps(6,end) forwards}.pixel-friend.rescued i{filter:none}.pixel-friend.rescued::after{display:none}
-
-.pixel-glitch{position:absolute;width:clamp(58px,7vw,94px);aspect-ratio:1;transform:translate(-50%,-50%);border:4px solid #17102c;background:#501f76;box-shadow:5px 5px 0 #17102c88;animation:glitchBox .55s steps(2,end) infinite;pointer-events:none}.pixel-glitch i{position:absolute;display:block;background:#ff42c8}.pixel-glitch i:nth-child(1){left:9%;top:14%;width:60%;height:18%}.pixel-glitch i:nth-child(2){right:8%;top:43%;width:56%;height:20%;background:#25dbff}.pixel-glitch i:nth-child(3){left:17%;bottom:10%;width:68%;height:15%;background:#ffe13f}.pixel-glitch.hit{animation:glitchHit .34s steps(4,end)}
-
-.pixel-portal-gate{position:absolute;width:clamp(105px,14vw,190px);aspect-ratio:1.25;transform:translate(-50%,-45%);display:grid;place-items:center;pointer-events:none}.pixel-portal-gate i{width:70%;aspect-ratio:1;border:10px solid #4d2a63;border-radius:50%;background:repeating-conic-gradient(#542964 0 12deg,#251333 12deg 24deg);box-shadow:0 0 0 6px #1c1026aa;animation:portalSpin 1.2s steps(8,end) infinite}.pixel-portal-gate b{position:absolute;bottom:-4px;padding:4px 7px;border:3px solid #17102c;border-radius:3px;color:#fff;background:#57245f;font:1000 clamp(.48rem,.8vw,.68rem)/1 "Courier New",monospace;white-space:nowrap}.pixel-portal-gate.open i{border-color:#ff41cc;background:repeating-conic-gradient(#24e0ff 0 12deg,#ff41cc 12deg 24deg);box-shadow:0 0 0 6px #fff29b,0 0 26px #ff41cc}.pixel-portal-gate.open b{color:#22102b;background:#ffe13f;animation:portalLabel .5s steps(2,end) infinite}
-
-@keyframes pixelBob{to{transform:translate(-50%,-58%)}}
-@keyframes pixelCollect{to{opacity:0;transform:translate(-50%,-50%) scale(2) rotate(20deg)}}
-@keyframes pixelCage{to{border-color:#ff41cc;box-shadow:0 0 0 4px #2de0ff66,0 0 22px #ff41cc}}
-@keyframes pixelRescue{40%{transform:translate(-50%,-95%) scale(1.25);filter:drop-shadow(0 0 16px #fff)}100%{opacity:0;transform:translate(-50%,-120%) scale(.7)}}
-@keyframes glitchBox{0%{clip-path:polygon(0 0,100% 7%,92% 100%,5% 91%)}100%{clip-path:polygon(7% 4%,94% 0,100% 92%,0 100%);transform:translate(-50%,-50%) translateX(4px)}}
-@keyframes glitchHit{50%{transform:translate(-50%,-50%) scale(1.45) rotate(18deg);filter:brightness(2)}100%{transform:translate(-50%,-50%) scale(.8) rotate(-12deg)}}
-@keyframes portalSpin{to{transform:rotate(360deg)}}
-@keyframes portalLabel{50%{transform:translateY(-3px)}}
-@keyframes pixelUrgent{50%{filter:brightness(1.45)}}
-@keyframes pixelScan{to{transform:translateY(8%)}}
-
-@media(max-width:680px){.pixel-hero{width:clamp(78px,15vw,125px)}.pixel-hero.pixel-duo{width:clamp(145px,28vw,230px)}.pixel-friend{width:clamp(72px,13vw,112px)}.pixel-switcher button{min-width:102px;min-height:42px;padding:6px}.pixel-mission{min-width:44%;max-width:52%;padding:6px 7px}.pixel-token{width:56px}.pixel-portal-gate{width:120px}}
-@media(max-height:620px){.pixel-switcher{bottom:1%}.pixel-switcher button{min-height:38px;padding:5px 8px}.pixel-mission{top:1%;padding:5px 7px}.pixel-hero{width:105px}.pixel-friend{width:96px}.pixel-token{width:52px}.pixel-portal-gate{width:105px}}
-
 /* Always use dark ink on cream, gold, or pink controls. */
 .power-readout,.green-label,.case-guide,.watch-status,.hint-button,.route-banner,
 .rescue-mission-panel,.rescue-status,.meemaw-help{color:#2b140f}
@@ -352,43 +308,3 @@ body.game-setup .instruction-card{margin:auto}
 .pond-clue>span{display:block;width:clamp(44px,5vw,68px);height:auto;aspect-ratio:1;margin:auto}
 .pond-destination>span{display:block;width:35px;height:35px;margin:-5px auto}
 .pond-goose.tangled::after{left:-12%;right:auto;top:48%;width:124%;height:auto;aspect-ratio:1;border:0;border-radius:0;box-shadow:none;background-image:url("assets/pond-props.png");background-size:200% 200%;background-position:100% 0;transform:rotate(-15deg)}
-
-/* Portal Hop: clear, tap-first pixel platform adventure. */
-.portal-world{overflow:hidden;color:#fff;touch-action:manipulation}
-.portal-stage .background-layer{image-rendering:pixelated;background-size:cover;background-position:center}
-.portal-route{position:absolute;inset:0;z-index:20;pointer-events:none}
-.portal-rung{position:absolute;left:0;width:100%;height:1px;transform:translateY(-50%);display:flex;align-items:center;justify-content:space-around}
-.rung-line{position:absolute;left:7%;right:7%;height:7px;border:2px solid #19132b;background:#47d7ef;box-shadow:0 0 0 3px #fae34e,0 0 18px #3ef4ff99;opacity:.9}
-.home-rung .rung-line{background:#7bec77;box-shadow:0 0 0 3px #fff275,0 0 22px #6eff8a}
-.portal-home{position:absolute;left:50%;top:-21px;transform:translateX(-50%);z-index:2;padding:5px 13px;border:3px solid #19132b;border-radius:4px;color:#171127;background:#ffe84d;box-shadow:4px 4px 0 #20142b;font:1000 clamp(.7rem,1.2vw,.95rem)/1 "Courier New",monospace;letter-spacing:.08em}
-.hop-gate{position:absolute;top:0;left:var(--gate-x,50%);transform:translate(-50%,-50%);z-index:4;width:clamp(82px,10vw,116px);min-height:78px;padding:7px 5px 4px;border:4px solid #161229;border-radius:50%;color:#11201e;background:#63f58f;box-shadow:0 0 0 4px #f9e33e,0 0 23px #75ffbd,5px 6px 0 #17122b;cursor:pointer;pointer-events:auto;touch-action:manipulation;font-family:"Courier New",monospace;text-align:center;transition:filter .15s,transform .15s}
-.hop-gate:nth-child(2){left:22%}.hop-gate:nth-child(3){left:50%}.hop-gate:nth-child(4){left:78%}
-.hop-gate>i{display:block;width:28px;height:28px;margin:0 auto 2px;border:4px solid #fff;border-radius:50%;background:#32a5f2;box-shadow:inset 0 0 0 4px #b7fff3,0 0 12px #fff}
-.hop-gate>b{display:block;font-size:clamp(.53rem,.9vw,.7rem);line-height:1.05;letter-spacing:.02em}
-.hop-gate>small{display:block;margin-top:2px;color:#155326;font-size:clamp(.5rem,.75vw,.62rem);font-weight:1000}
-.hop-gate:hover:not(:disabled),.hop-gate:focus-visible{transform:translate(-50%,-56%) scale(1.08);filter:brightness(1.12)}
-.hop-gate:disabled{cursor:default}.hop-gate[hidden]{display:none}
-.hop-gate.blocked{background:#bd62e9;box-shadow:0 0 0 4px #ffcf4a,0 0 18px #ff58fc88,5px 6px 0 #17122b}
-.hop-gate.blocked>i{background:#7b38c5}.hop-gate.blocked>small{color:#fff}
-.hop-gate.star-gate:not(.blocked){outline:4px dashed #fff;outline-offset:7px}
-.hop-gate.zapped{animation:portalZap .35s steps(2,end)}
-.portal-glitch-shutter{position:absolute;z-index:39;transform:translate(-50%,-50%);width:clamp(80px,11vw,132px);height:42px;display:grid;place-items:center;border:4px solid #241038;border-radius:5px;background:repeating-linear-gradient(135deg,#ff42d1 0 8px,#641fa0 8px 16px);box-shadow:0 0 0 3px #ffe143,0 0 20px #fa5affaa;color:#fff;font:1000 clamp(.56rem,.9vw,.75rem)/1 "Courier New",monospace;text-shadow:2px 2px #301044;pointer-events:none;animation:pixelScan 1.3s steps(5,end) infinite alternate}
-.portal-glitch-shutter b{padding:2px 5px;background:#341247d9}
-.portal-hero{position:absolute;z-index:64;width:clamp(84px,10vw,132px);aspect-ratio:1;transform:translate(-50%,-80%);filter:drop-shadow(0 7px 0 #17132b99);pointer-events:none;image-rendering:pixelated}
-.portal-hero i{display:block;width:100%;height:100%;background-repeat:no-repeat;image-rendering:pixelated}
-.portal-sheet-sisters i{background-image:url("assets/pixel-sisters.png");background-size:200% 100%}
-.portal-sheet-sisters.portal-slot-0 i{background-position:left center}.portal-sheet-sisters.portal-slot-1 i{background-position:right center}
-.portal-sheet-friends-a i{background-image:url("assets/pixel-friends-a.png");background-size:300% 100%}
-.portal-sheet-friends-b i{background-image:url("assets/pixel-friends-b.png");background-size:300% 100%}
-.portal-sheet-friends-a.portal-slot-0 i,.portal-sheet-friends-b.portal-slot-0 i{background-position:left center}
-.portal-sheet-friends-a.portal-slot-1 i,.portal-sheet-friends-b.portal-slot-1 i{background-position:center center}
-.portal-sheet-friends-a.portal-slot-2 i,.portal-sheet-friends-b.portal-slot-2 i{background-position:right center}
-.portal-hero.portal-vanish{animation:portalVanish .28s steps(4,end) forwards}
-.portal-hero.portal-arrive{animation:portalArrive .42s steps(5,end)}
-.portal-mission{z-index:76;min-width:min(320px,44%);box-shadow:4px 4px 0 #27204b}
-.portal-mission small{max-width:320px}
-@keyframes portalVanish{50%{transform:translate(-50%,-80%) scale(.5);filter:brightness(2)}100%{transform:translate(-50%,-80%) scale(.05);opacity:.1}}
-@keyframes portalArrive{0%{transform:translate(-50%,-80%) scale(.08);opacity:.25}70%{transform:translate(-50%,-80%) scale(1.14)}100%{transform:translate(-50%,-80%) scale(1);opacity:1}}
-@keyframes portalZap{25%{transform:translate(-50%,-50%) translateX(-8px)}75%{transform:translate(-50%,-50%) translateX(8px)}}
-@media(max-width:650px){.portal-mission{min-width:54%;max-width:76%;padding:6px 8px}.portal-mission small{max-width:260px}.hop-gate{width:76px;min-height:68px;padding:5px 3px 3px;border-width:3px}.hop-gate>i{width:23px;height:23px}.portal-hero{width:clamp(75px,15vw,104px)}.portal-glitch-shutter{width:78px;height:34px}}
-@media(max-width:420px){.portal-mission{max-width:80%}.portal-mission small{font-size:.58rem}.hop-gate{width:69px;min-height:63px}.portal-home{top:-17px;padding:4px 9px}}

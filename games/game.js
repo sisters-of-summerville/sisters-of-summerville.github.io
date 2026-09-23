@@ -75,14 +75,8 @@
       background: "assets/backyard.webp", character: "assets/maggie-jean.webp",
       instructions: "Drag to steer Maggie Jean. Grab every letter, chain deliveries for bigger points, hit yellow TURBO stamps for a burst of ridiculous speed, dodge sprinklers and squirrels, then slam into the mailbox before time expires.",
       rewards: ["Turbo speed bursts", "Mail-chain multipliers", "Three escalating delivery sprints"], button: "ENGAGE TURBO"
-    },
-    {
-      id: "pixelpanic", title: "Portal Hop!", kicker: "Pixel Portal Adventure",
-      description: "Hop through glowing portals with eight familiar characters, dodge the moving glitch, and get everyone home.",
-      background: "assets/pixel-summerville.png", character: "assets/pixel-sisters.png",
-      instructions: "Tap an OPEN portal to hop forward. The purple glitch slides across the next platform, so wait for a safe opening if you need to. Pick up star portals for bonus points and reach HOME. Meet eight characters along the way.",
-      rewards: ["Eight pixel characters", "Tap to hop through portals", "Watch the moving glitch"], button: "START PORTAL HOP"
     }
+
   ];
 
   const defaultProgress = { tickets: 0, games: {} };
@@ -927,78 +921,7 @@
       return{start,stop(){running=false;},destroy(){running=false;runtime.clear();}};
     },
 
-    pixelpanic() {
-      const runtime=makeRuntime();
-      const levels=[
-        {name:"Honey Bear",sheet:"sisters",slot:0}, {name:"Bootsie Belle",sheet:"sisters",slot:1},
-        {name:"Spot",sheet:"friends-a",slot:0}, {name:"Hershey",sheet:"friends-a",slot:1},
-        {name:"Gumbo",sheet:"friends-a",slot:2}, {name:"Cap’n Oh Yeah",sheet:"friends-b",slot:0},
-        {name:"Tiffany",sheet:"friends-b",slot:1}, {name:"Radar",sheet:"friends-b",slot:2}
-      ];
-      const lanes=[22,50,78], rows=[78,66,54,42,30,18];
-      let level=0,hops=0,glitches=0,score=0,running=false,transiting=false,hero,heroName,portals=[],shutter,mission,now=0;
-      function start(){
-        stage.classList.add("pixel-stage","portal-stage");world.classList.add("pixel-world","portal-world");
-        running=true;buildStage();runtime.frame(loop);
-      }
-      function buildStage(){
-        world.innerHTML="";portals=[];transiting=false;hops=0;
-        const cfg=levels[level];world.dataset.pixelLevel=String(Math.min(3,Math.ceil((level+1)/3)));
-        mission=create("div","pixel-mission portal-mission");
-        mission.innerHTML=`<span>STAGE ${level+1}/8 · PORTAL HOP</span><b>GET ${cfg.name.toUpperCase()} HOME!</b><small>Tap an OPEN portal on the next platform. Purple glitches block the way.</small>`;
-        const route=create("div","portal-route");
-        rows.forEach((y,index)=>{
-          const rung=create("div",index===rows.length-1?"portal-rung home-rung":"portal-rung");rung.style.top=`${y}%`;
-          const line=create("i","rung-line",rung);
-          if(index===rows.length-1){const home=create("span","portal-home",rung);home.textContent="⌂ HOME";}
-          else lanes.forEach((x,lane)=>{
-            const button=create("button","hop-gate",rung);button.type="button";button.dataset.lane=String(lane);button.setAttribute("aria-label",`Tap portal ${lane===50?"Center":lane<50?"Left":"Right"}`);
-            button.innerHTML=`<i></i><b>${lane===50?"CENTER":lane<50?"LEFT":"RIGHT"}</b><small>OPEN</small>`;
-            button.addEventListener("click",()=>hop(lane,button));portals.push({x:lane,el:button,row:index});
-          });
-        });
-        shutter=create("div","portal-glitch-shutter");shutter.innerHTML="<b>GLITCH</b>";world.appendChild(shutter);
-        hero=create("div",`portal-hero portal-sheet-${cfg.sheet} portal-slot-${cfg.slot}`);
-        hero.setAttribute("aria-label",`${cfg.name} pixel character`);hero.innerHTML="<i></i>";world.appendChild(hero);place(hero,50,rows[0],63);
-        updateHud();updateGates();
-      }
-      function updateHud(){setHud("Character",`${level+1}/8`,"Hops",`${hops}/5`,"Glitches",glitches);}
-      function updateGates(){
-        const nextRow=hops+1,barX=50+30*Math.sin(now/740+level*.83+hops*.67);
-        portals.forEach((portal)=>{
-          const active=portal.row===hops;
-          const blocked=active&&Math.abs(portal.x-barX)<21;
-          portal.el.hidden=!active;portal.el.classList.toggle("blocked",blocked);portal.el.classList.toggle("star-gate",active&&portal.x===((level+hops)%2===0?22:78));
-          const status=portal.el.querySelector("small");if(status)status.textContent=blocked?"WAIT":"OPEN";
-          portal.el.disabled=!active||transiting;
-        });
-        shutter.style.left=`${barX}%`;shutter.style.top=`${rows[nextRow]}%`;
-        shutter.classList.toggle("shutter-home",nextRow===rows.length-1);
-      }
-      function hop(lane,button){
-        if(!running||paused||transiting||!roundOverlay.hidden||!resultOverlay.hidden)return;
-        const barX=50+30*Math.sin(now/740+level*.83+hops*.67);
-        if(Math.abs(lane-barX)<21){glitches++;score=Math.max(0,score-100);button.classList.add("zapped");popText(lane,rows[hops],"ZAP! WAIT FOR OPEN");beep(130,.11,"square",.035);runtime.later(()=>button.classList.remove("zapped"),400);updateHud();return;}
-        transiting=true;portals.forEach(p=>p.el.disabled=true);
-        hero.classList.add("portal-vanish");beep(720,.07,"square",.03);
-        const nextHop=hops+1;const landingX=lane;
-        runtime.later(()=>{
-          hops=nextHop;place(hero,landingX,rows[hops],63);hero.classList.remove("portal-vanish");hero.classList.add("portal-arrive");
-          runtime.later(()=>hero?.classList.remove("portal-arrive"),420);
-          score+=250+(lane===(level%2===0?22:78)?200:0);transiting=false;updateHud();
-          if(hops===5){arriveHome();return;}updateGates();
-        },300);
-      }
-      function arriveHome(){
-        const cfg=levels[level];score+=500;beep(850,.12,"square",.04);
-        if(level===levels.length-1){finish();return;}
-        running=false;level++;showRound(`Stage ${level} Complete`,`${cfg.name} made it home!`,`Next up: ${levels[level].name}. Same simple move: tap an OPEN portal, avoid the purple glitch, reach HOME.`,`Meet ${levels[level].name}`,()=>{roundOverlay.hidden=true;running=true;buildStage();runtime.frame(loop);});
-      }
-      function loop(timestamp){if(!running)return;now=timestamp;if(!paused&&roundOverlay.hidden&&resultOverlay.hidden&&!transiting)updateGates();runtime.frame(loop);}
-      function finish(){running=false;const stars=glitches===0?3:glitches<=7?2:1;
-        completeGame({score,stars,kicker:"Eight Characters Rescued",title:"EVERYONE MADE IT HOME!",line:`Eight pixel pals hopped safely through the portals!${glitches?` You took ${glitches} glitch-zaps along the way.`:" Not one glitch got you!"}<br><b>Great portal piloting!</b>`,playAgainLabel:"Play Portal Hop Again",arcadeLabel:"Choose Another Game"});}
-      return{start,stop(){running=false;},destroy(){running=false;runtime.clear();stage.classList.remove("pixel-stage","portal-stage");world.classList.remove("pixel-world","portal-world");delete world.dataset.pixelLevel;}};
-    }
+
   };
 
   $("startGameButton").addEventListener("click", launchCurrentGame);
@@ -1036,5 +959,5 @@
   renderArcade();
   const requestedGame = new URLSearchParams(window.location.search).get("game");
   if (requestedGame && !openGame(requestedGame,false)) setGameUrl(null);
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=23").catch(()=>{}));
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js?v=24").catch(()=>{}));
 })();
