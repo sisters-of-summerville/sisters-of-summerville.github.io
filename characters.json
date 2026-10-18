@@ -335,5 +335,19 @@
       "Peace Giver"
     ],
     "description": "A familiar face beneath the sunrise, Gator Bob is the pond’s unofficial breakfast inspector. With knowing amber eyes, a toothy grin, and impeccable timing, he quietly appears whenever the hotdog bait comes out. He brings Karl a little peace, costs the gang a little lunch, and gives Bootsie Belle plenty to complain about."
+  },
+  {
+    "name": "Fishing Karl 🎣",
+    "image": "characters/fishing-karl.png",
+    "tags": [
+      "Pond",
+      "Fishing",
+      "Karl",
+      "Gator Bob",
+      "Peace",
+      "Sunrise",
+      "Reflection"
+    ],
+    "description": "Easygoing and always ready for a sunrise cast, Fishing Karl finds joy in quiet water, good company, and whatever the morning brings. Sporting his fishing vest and trusty folding chair, he welcomes Dad, Honey Bear, and Bootsie Belle for lessons in fishing—and taking life as it comes. Even when Gator Bob steals his bait, Karl keeps his sense of humor."
   }
 ]
