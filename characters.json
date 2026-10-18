@@ -321,5 +321,19 @@
       "Martial Arts"
     ],
     "description": "Bruce is a dragonfly that likes to fly around close to the back covered porch where the cat Bootsie Belle is taunted by this winged intruder."
+  },
+  {
+    "name": "Gator Bob 🐊",
+    "image": "characters/gator-bob.png",
+    "tags": [
+      "Gator",
+      "Pond",
+      "Fishing",
+      "Karl",
+      "Bait Thief",
+      "Line Breaker",
+      "Peace Giver"
+    ],
+    "description": "A familiar face beneath the sunrise, Gator Bob is the pond’s unofficial breakfast inspector. With knowing amber eyes, a toothy grin, and impeccable timing, he quietly appears whenever the hotdog bait comes out. He brings Karl a little peace, costs the gang a little lunch, and gives Bootsie Belle plenty to complain about."
   }
 ]
