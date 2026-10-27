@@ -360,5 +360,16 @@
       "Halloween"
     ],
     "description": "Honey Bear sport a pumpkin costume for Halloween."
+  },
+  {
+    "name": "Bootsie Belle: The Southern Vampire Countess",
+    "image": "characters/bootsie-belle-the-southern-vampire-countess.png",
+    "tags": [
+      "Bootsie Belle",
+      "Southern Vampire Countess",
+      "Costume",
+      "Halloween"
+    ],
+    "description": "Bootsie Belle’s costume for Halloween."
   }
 ]
