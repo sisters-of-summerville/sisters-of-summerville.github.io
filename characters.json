@@ -349,5 +349,16 @@
       "Reflection"
     ],
     "description": "Easygoing and always ready for a sunrise cast, Fishing Karl finds joy in quiet water, good company, and whatever the morning brings. Sporting his fishing vest and trusty folding chair, he welcomes Dad, Honey Bear, and Bootsie Belle for lessons in fishing—and taking life as it comes. Even when Gator Bob steals his bait, Karl keeps his sense of humor."
+  },
+  {
+    "name": "Honey Bear: The Sweet Little Pumpkin",
+    "image": "characters/honey-bear-the-sweet-little-pumpkin.png",
+    "tags": [
+      "Honey Bear",
+      "Sweet Little Pumpkin",
+      "Yorkie",
+      "Halloween"
+    ],
+    "description": "Honey Bear sport a pumpkin costume for Halloween."
   }
 ]
