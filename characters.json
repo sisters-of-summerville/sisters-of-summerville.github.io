@@ -371,5 +371,16 @@
       "Halloween"
     ],
     "description": "Bootsie Belle’s costume for Halloween."
+  },
+  {
+    "name": "Pixie Curl Mom: The Kindhearted Halloween Witch",
+    "image": "characters/pixie-curl-mom-the-kindhearted-halloween-witch.png",
+    "tags": [
+      "Pixie Curl Mom",
+      "Kindhearted Halloween Witch",
+      "Costume",
+      "Halloween"
+    ],
+    "description": "Mom’s costume for Halloween."
   }
 ]
